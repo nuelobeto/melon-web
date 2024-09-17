@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: 'http://staging-api.getmelon.co/api/v1',
+  baseURL: 'https://staging-api.getmelon.co/api/v1',
   headers: {
     'Content-Type': 'application/json',
   },

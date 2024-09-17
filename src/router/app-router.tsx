@@ -3,6 +3,7 @@ import {Navigate, Route, Routes} from 'react-router-dom';
 import {ROUTES} from './routes';
 import {VerifyEmailMobile} from '@/pages/onboarding/mobile/verify-email';
 import {VerifyPhoneMobile} from '@/pages/onboarding/mobile/verify-phone';
+import {DowloadApp} from '@/pages/onboarding/mobile/dowload-app';
 
 const AppRouter = () => {
   return (
@@ -16,6 +17,7 @@ const AppRouter = () => {
       <Route path={ROUTES.verifyEmailMobile} element={<VerifyEmailMobile />} />
       <Route path={ROUTES.referralCreateAccount} element={<EnterPhone />} />
       <Route path={ROUTES.verifyPhoneMobile} element={<VerifyPhoneMobile />} />
+      <Route path={ROUTES.downloadApp} element={<DowloadApp />} />
     </Routes>
   );
 };

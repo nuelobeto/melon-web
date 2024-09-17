@@ -54,8 +54,8 @@ export const VerifyEmailMobile = () => {
     },
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    resendEmailOtp(data.email);
+  function onSubmit(values: z.infer<typeof FormSchema>) {
+    resendEmailOtp(values.email);
   }
 
   const resendEmailOtp = async (email: string) => {
@@ -116,7 +116,7 @@ export const VerifyEmailMobile = () => {
             height={200}
             className="mb-6"
           />
-          <div className="w-full max-w-[300px]">
+          <div className="w-full max-w-[350px]">
             <h1 className="font-medium text-2xl text-pashBlack-1 text-center mb-2">
               An error occured
             </h1>
@@ -127,7 +127,7 @@ export const VerifyEmailMobile = () => {
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="flex flex-col gap-2"
+                className="flex flex-col gap-4"
               >
                 <FormField
                   control={form.control}
@@ -136,7 +136,11 @@ export const VerifyEmailMobile = () => {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="Email address" {...field} />
+                        <Input
+                          type="email"
+                          placeholder="Email address"
+                          {...field}
+                        />
                       </FormControl>
 
                       <FormMessage />
