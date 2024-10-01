@@ -39,12 +39,12 @@ export const EnterPhone = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const params = useParams();
-  const code = params.refCode;
+  const refCode = params.refCode;
 
-  const getReferalDetails = async (code: string) => {
+  const getReferalDetails = async (refCode: string) => {
     setDetailsLoading(true);
     try {
-      const res = await authServices.getReferralDetails(code);
+      const res = await authServices.getReferralDetails(refCode);
       if (res.status === 'success') {
         setReferrer(res.data.first_name);
         setDetailsLoading(false);
@@ -71,14 +71,16 @@ export const EnterPhone = () => {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    const payload: CreateAccountT = {
-      phone_number: values.phone.slice(1),
-      country_code: `+${selectedCountryCode!.callingCode}`,
-      referral_code: 'NUEL79',
-      referred: true,
-    };
+    if (refCode) {
+      const payload: CreateAccountT = {
+        phone_number: values.phone.slice(1),
+        country_code: `+${selectedCountryCode!.callingCode}`,
+        referral_code: refCode,
+        referred: true,
+      };
 
-    createAccount(payload);
+      createAccount(payload);
+    }
   }
 
   const createAccount = async (payload: CreateAccountT) => {
@@ -113,10 +115,10 @@ export const EnterPhone = () => {
   }, []);
 
   useEffect(() => {
-    if (code) {
-      getReferalDetails(code);
+    if (refCode) {
+      getReferalDetails(refCode);
     }
-  }, [code]);
+  }, [refCode]);
 
   useEffect(() => {
     if (countryCodes.length > 0 && !selectedCountryCode) {
