@@ -4,9 +4,11 @@ import 'melon-web-widget/dist/index.css';
 
 export const WidgetTest = () => {
   const handleOpenWidget = () => {
+    const api_key = 'BBszTq94xd61szHBD';
     const config: MelonConfig = {
-      store_name: 'Jumia',
-      reference: 'REF12345',
+      melon_id: 'KEHI60',
+      store_name: 'obetoandsons',
+      reference: 'REF3',
       items: [
         {
           item: 'Watermelon',
@@ -22,7 +24,7 @@ export const WidgetTest = () => {
       date: '2024-09-26',
       total_amount: 8000,
     };
-    openWidget(config);
+    openWidget(config, api_key);
   };
 
   return (
