@@ -88,9 +88,10 @@ export const EnterPhone = () => {
     try {
       const res = await authServices.createAccount(payload);
       if (res.status === 'success') {
-        localStorage.setItem('phone', JSON.stringify(payload.phone_number));
         setLoading(false);
-        navigate(ROUTES.verifyPhoneMobile);
+        navigate(
+          ROUTES.verifyPhoneMobile.replace(':phone', payload.phone_number),
+        );
       }
     } catch (error: any) {
       toast.error(error.response.data.message);

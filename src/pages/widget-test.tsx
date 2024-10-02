@@ -6,9 +6,8 @@ export const WidgetTest = () => {
   const handleOpenWidget = () => {
     const api_key = 'BBszTq94xd61szHBD';
     const config: MelonConfig = {
-      melon_id: 'KEHI60',
       store_name: 'obetoandsons',
-      reference: 'REF3',
+      reference: 'REF9',
       items: [
         {
           item: 'Watermelon',

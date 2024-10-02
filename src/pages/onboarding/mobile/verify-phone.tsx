@@ -11,8 +11,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import {InputOTP, InputOTPGroup, InputOTPSlot} from '@/components/ui/input-otp';
-import {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useEffect, useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
 import {toast} from 'react-toastify';
 import authServices from '@/services/auth';
 import {ROUTES} from '@/router/routes';
@@ -21,9 +21,10 @@ import {Loader2} from 'lucide-react';
 export const VerifyPhoneMobile = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const savedPhone: string | null = localStorage.getItem('phone');
-  const parsedPhone: string | null = savedPhone ? JSON.parse(savedPhone) : null;
   const [resendingOtp, setResendingOtp] = useState(false);
+  const params = useParams();
+  const phone = params.phone;
+  const otpCode = params.otp;
 
   const formSchema = z.object({
     otp: z.string().min(2, {
@@ -57,10 +58,10 @@ export const VerifyPhoneMobile = () => {
   };
 
   const resendOtp = async () => {
-    if (parsedPhone) {
+    if (phone) {
       setResendingOtp(true);
       try {
-        const res = await authServices.resendOtp(parsedPhone);
+        const res = await authServices.resendOtp(phone);
         if (res.status === 'success') {
           setResendingOtp(false);
         }
@@ -70,6 +71,14 @@ export const VerifyPhoneMobile = () => {
       }
     }
   };
+
+  useEffect(() => {
+    if (otpCode) {
+      form.reset({
+        otp: otpCode,
+      });
+    }
+  }, [form, otpCode]);
 
   return (
     <div className="w-screen h-screen bg-white flex items-center justify-center px-5 py-16">

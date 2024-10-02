@@ -18,6 +18,10 @@ const AppRouter = () => {
       <Route path={ROUTES.verifyEmailMobile} element={<VerifyEmailMobile />} />
       <Route path={ROUTES.referralCreateAccount} element={<EnterPhone />} />
       <Route path={ROUTES.verifyPhoneMobile} element={<VerifyPhoneMobile />} />
+      <Route
+        path={ROUTES.verifyPhoneMobileFromWidget}
+        element={<VerifyPhoneMobile />}
+      />
       <Route path={ROUTES.downloadApp} element={<DowloadApp />} />
       <Route path={'/widget'} element={<WidgetTest />} />
     </Routes>
