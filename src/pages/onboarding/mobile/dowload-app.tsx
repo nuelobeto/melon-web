@@ -16,7 +16,7 @@ export const DowloadApp = () => {
             Congratulations
           </h1>
           <p className="text-pashBlack-5 text-center">
-            Click the button below to download teh app and claim your reward.
+            Click the button below to download the app and claim your reward.
           </p>
           <div className="flex flex-col gap-2 mt-8">
             <Button className="bg-darkLime-1 text-white h-12 justify-start hover:bg-darkLime-1/95 border-darkLime-1 gap-3">

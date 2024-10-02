@@ -143,7 +143,7 @@ export const EnterPhone = () => {
             Yay! {referrer} has referred you to start earning points on Melon
           </h1>
           <p className="text-pashBlack-5 mb-8 text-center">
-            Enter your phone number below to begin your journey
+            Enter your phone number below to earn 500 points!
           </p>
           <Form {...form}>
             <form
