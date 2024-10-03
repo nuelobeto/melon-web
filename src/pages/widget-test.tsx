@@ -1,13 +1,18 @@
 import {Button} from '@/components/ui/button';
-import {openWidget, MelonConfig} from 'melon-web-widget';
+import {openWidget, StoreConfigType, MelonReceiptType} from 'melon-web-widget';
 import 'melon-web-widget/dist/index.css';
 
 export const WidgetTest = () => {
   const handleOpenWidget = () => {
-    const api_key = 'BBszTq94xd61szHBD';
-    const config: MelonConfig = {
+    const store: StoreConfigType = {
+      store_logo:
+        'https://res.cloudinary.com/dk9bt9lkn/image/upload/v1704231822/qudra/vue_zjazcr.png',
+      api_key: 'BBszTq94xd61szHBD',
       store_name: 'obetoandsons',
-      reference: 'REF9',
+    };
+
+    const payload: MelonReceiptType = {
+      reference: 'REF20',
       items: [
         {
           item: 'Watermelon',
@@ -23,7 +28,7 @@ export const WidgetTest = () => {
       date: '2024-09-26',
       total_amount: 8000,
     };
-    openWidget(config, api_key);
+    openWidget(store, payload);
   };
 
   return (

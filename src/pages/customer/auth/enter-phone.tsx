@@ -12,21 +12,14 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {ChevronDown, Loader2} from 'lucide-react';
+import {Loader2} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import {CountryCodeType, CreateAccountT} from '@/types';
-import axios from 'axios';
-import {ScrollArea} from '@/components/ui/scroll-area';
 import {toast} from 'react-toastify';
 import authServices from '@/services/auth';
 import {useNavigate, useParams} from 'react-router-dom';
 import {ROUTES} from '@/router/routes';
+import {CountryCode} from '@/components/ui/country-code';
 
 export const EnterPhone = () => {
   const [referrer, setReferrer] = useState('');
@@ -100,22 +93,6 @@ export const EnterPhone = () => {
   };
 
   useEffect(() => {
-    const getCountryCodes = async () => {
-      const res = await axios.get('https://restcountries.com/v2/all');
-      const countries = res.data.map((c: any) => {
-        return {
-          callingCode: c.callingCodes[0],
-          code: c.alpha3Code,
-          flag: c.flags.png,
-          name: c.name,
-        };
-      });
-      setCountryCodes(countries);
-    };
-    getCountryCodes();
-  }, []);
-
-  useEffect(() => {
     if (refCode) {
       getReferalDetails(refCode);
     }
@@ -160,6 +137,7 @@ export const EnterPhone = () => {
                     <FormControl>
                       <div className="relative flex items-center">
                         <CountryCode
+                          setCountryCodes={setCountryCodes}
                           countryCodes={countryCodes}
                           selectedCountryCode={selectedCountryCode}
                           setSelectedCountryCode={setSelectedCountryCode}
@@ -201,48 +179,6 @@ export const EnterPhone = () => {
           </div>
         </div>
       )}
-    </div>
-  );
-};
-
-const CountryCode = ({
-  countryCodes,
-  selectedCountryCode,
-  setSelectedCountryCode,
-}: {
-  countryCodes: CountryCodeType[];
-  selectedCountryCode: CountryCodeType | null;
-  setSelectedCountryCode: React.Dispatch<
-    React.SetStateAction<CountryCodeType | null>
-  >;
-}) => {
-  return (
-    <div className="absolute left-2.5">
-      <DropdownMenu>
-        <DropdownMenuTrigger className="flex items-center gap-1">
-          <img
-            src={selectedCountryCode?.flag ?? ''}
-            alt=""
-            width={20}
-            height={20}
-          />{' '}
-          <ChevronDown className="w-5 h-5" />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-[250px]">
-          <ScrollArea className="h-[400px]">
-            {countryCodes.map((country, index) => (
-              <DropdownMenuItem
-                key={index}
-                className="gap-1.5"
-                onClick={() => setSelectedCountryCode(country)}
-              >
-                <img src={country.flag} alt="" width={20} height={20} />
-                <span>{country.name}</span>
-              </DropdownMenuItem>
-            ))}
-          </ScrollArea>
-        </DropdownMenuContent>
-      </DropdownMenu>
     </div>
   );
 };
