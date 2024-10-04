@@ -30,15 +30,18 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
-import {ChevronDown, X} from 'lucide-react';
+import {ChevronDown, Loader2, X} from 'lucide-react';
 import {Checkbox} from '@/components/ui/checkbox';
 import {AiOutlineCloudUpload} from 'react-icons/ai';
+import {FileUpload} from '@/components/ui/file-upload';
+import {FileType} from '@/types';
 
 export const BusinessDetails = () => {
-  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [logo, setLogo] = useState<FileType | null>(null);
+  const [logoLoading, setLogoLoading] = useState(false);
 
   const formSchema = z.object({
-    business_logo: z.instanceof(File).optional(),
+    business_logo: z.string().optional(),
     cac_rc_number: z.string().min(1, {
       message: 'Please enter your CAC/RC Number',
     }),
@@ -81,7 +84,7 @@ export const BusinessDetails = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      business_logo: undefined,
+      business_logo: '',
       cac_rc_number: '',
       business_name: '',
       business_email: '',
@@ -100,15 +103,6 @@ export const BusinessDetails = () => {
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
   }
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      form.setValue('business_logo', file);
-      const previewUrl = URL.createObjectURL(file);
-      setLogoPreview(previewUrl);
-    }
-  };
 
   const platforms = [
     {label: 'Website', value: 'website'},
@@ -138,15 +132,7 @@ export const BusinessDetails = () => {
     });
   }, [form]);
 
-  useEffect(() => {
-    return () => {
-      if (logoPreview) {
-        URL.revokeObjectURL(logoPreview);
-      }
-    };
-  }, [logoPreview]);
-
-  console.log(logoPreview);
+  console.log(logo);
 
   return (
     <Form {...form}>
@@ -157,57 +143,50 @@ export const BusinessDetails = () => {
         />
 
         <div className="flex flex-col gap-8">
-          <FormField
-            control={form.control}
-            name="business_logo"
-            render={({field: {value, onChange, ...fieldProps}}) => (
-              <FormItem className="w-full max-w-[335px] p-5 rounded-lg border border-dashed border-mountainAsh-1 bg-mountainAsh-10">
-                <FormControl>
-                  <div className="flex flex-col items-center">
-                    <div className="w-10 h-10 flex items-center justify-center rounded-full bg-mountainAsh-7">
-                      <AiOutlineCloudUpload className="w-6 h-6 text-pashBlack-3" />
-                    </div>
-                    <p className="text-xs text-pashBlack-4 mt-1">
-                      Upload Business Logo
-                    </p>
-                    <label htmlFor="file">
-                      {logoPreview ? (
-                        <img
-                          src={logoPreview}
-                          alt="Logo preview"
-                          className="max-w-full h-auto"
-                        />
-                      ) : (
-                        <>
-                          <div className="text-center text-sm flex items-center gap-1 mt-1.5 cursor-pointer">
-                            <span className="text-pink-1">
-                              Click to upload logo
-                            </span>
-                            <span className="text-pashBlack-4">
-                              or drag and drop
-                            </span>
-                          </div>
-                          <p className="text-pashBlack-7 text-xs text-center mt-1">
-                            SVG, PNG, JPG (max. 800x400px)
-                          </p>
-                        </>
-                      )}
-                    </label>
-                    <Input
-                      {...fieldProps}
-                      placeholder="Picture"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                      id="file"
-                      className="hidden"
+          <div className="w-full max-w-[335px] p-5 rounded-lg border border-dashed border-mountainAsh-1 bg-mountainAsh-10">
+            <div className="flex flex-col items-center">
+              {logo ? (
+                <>
+                  <div className="flex w-[80px] h-[80px] items-center justify-center p-4 border border-mountainAsh-1 rounded-full bg-mountainAsh-7">
+                    <img
+                      src={logo.url}
+                      alt=""
+                      className="w-full h-full object-contain"
                     />
                   </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  <Button
+                    type="button"
+                    className="w-[200px] border-0 h-8 bg-pashBlack-1 text-white text-xs mt-3 hover:bg-pashBlack-3"
+                    onClick={() => setLogo(null)}
+                  >
+                    Remove
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <div className="w-10 h-10 flex items-center justify-center rounded-full bg-mountainAsh-7">
+                    {logoLoading ? (
+                      <Loader2 className="w-6 h-6 text-pashBlack-3 animate-spin" />
+                    ) : (
+                      <AiOutlineCloudUpload className="w-6 h-6 text-pashBlack-3" />
+                    )}
+                  </div>
+                  <p className="text-xs text-pashBlack-4 mt-1">
+                    Upload Business Logo
+                  </p>
+                  <div className="text-center text-sm flex items-center gap-1 mt-1.5">
+                    <FileUpload setFile={setLogo} setLoading={setLogoLoading}>
+                      <span className="text-pink-1">Click to upload logo</span>
+                    </FileUpload>
+                    <span className="text-pashBlack-4">or drag and drop</span>
+                  </div>
+                  <p className="text-pashBlack-7 text-xs text-center mt-1">
+                    SVG, PNG, JPG (max. 800x400px)
+                  </p>
+                </>
+              )}
+            </div>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}

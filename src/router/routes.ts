@@ -17,4 +17,9 @@ export const ROUTES = {
   businessPersonalDetails: '/onboarding/business/personal-details',
   businessDetails: '/onboarding/business/details',
   businessDirectorDetails: '/onboarding/business/director-details',
+  businessOnboardingSuccess: '/onboarding/business/success',
+
+  // dashboard
+  home: '/home',
+  settings: '/settings',
 };

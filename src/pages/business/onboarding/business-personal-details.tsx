@@ -16,14 +16,14 @@ import {PageHeader} from '@/components/layouts/account-setup-layout';
 export const BusinessPersonalDetails = () => {
   const formSchema = z.object({
     first_name: z.string().min(1, {
-      message: 'Please enter your CAC/RC Number',
+      message: 'Please enter your first name',
     }),
     last_name: z.string().min(1, {
-      message: 'Please enter business name',
+      message: 'Please enter your last name',
     }),
     email: z
       .string()
-      .min(1, {message: 'Please enter your business email.'})
+      .min(1, {message: 'Please enter your email.'})
       .email({message: 'Please enter a valid email address.'}),
     phone_number: z.string().min(1, {
       message: 'Please enter your phone number.',

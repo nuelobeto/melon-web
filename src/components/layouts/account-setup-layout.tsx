@@ -5,7 +5,7 @@ export const AccountSetUpLayout = ({children}: {children: React.ReactNode}) => {
   return (
     <div className="w-screen h-screen">
       <header className="w-full h-16 bg-mountainAsh-7 border-b border-mountainAsh-6 flex items-center px-5">
-        <p className="font-semibold text-xl text-pashBlack-1">
+        <p className="font-medium text-xl text-pashBlack-1">
           Complete business registration
         </p>
       </header>

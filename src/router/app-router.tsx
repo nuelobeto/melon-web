@@ -13,6 +13,9 @@ import {BusinessPersonalDetails} from '@/pages/business/onboarding/business-pers
 import {BusinessOnboarding} from '@/pages/business/onboarding/business-onboarding';
 import {BusinessDetails} from '@/pages/business/onboarding/business-details';
 import {BusinessDirectorDetails} from '@/pages/business/onboarding/business-director-details';
+import {BusinessOnboardingSuccess} from '@/pages/business/onboarding/business-onboarding-success';
+import {Home} from '@/pages/business/dashboard/home';
+import {Settings} from '@/pages/business/dashboard/settings';
 
 const AppRouter = () => {
   return (
@@ -66,6 +69,14 @@ const AppRouter = () => {
           element={<BusinessDirectorDetails />}
         />
       </Route>
+      <Route
+        path={ROUTES.businessOnboardingSuccess}
+        element={<BusinessOnboardingSuccess />}
+      />
+
+      {/* Dashboard */}
+      <Route path={ROUTES.home} element={<Home />} />
+      <Route path={ROUTES.settings} element={<Settings />} />
 
       <Route path={'/widget'} element={<WidgetTest />} />
     </Routes>
