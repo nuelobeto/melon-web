@@ -27,7 +27,7 @@ export const Main = ({children}: {children: React.ReactNode}) => {
   return (
     <main className="grow h-full bg-white">
       <ScrollArea className="w-full h-full">
-        <div className="w-full max-w-[500px] h-full pt-32 px-5 pb-20 mx-auto">
+        <div className="w-full max-w-[500px] pt-32 px-5 pb-20 mx-auto">
           {children}
         </div>
       </ScrollArea>

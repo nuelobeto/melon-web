@@ -6,12 +6,15 @@ export const ROUTES = {
   verifyPhoneMobileFromWidget: '/users/verify-phone/:phone/:otp',
   downloadApp: '/get-the-app',
 
-  // business onboarding
+  // business auth
   createBusinessAccount: '/auth/business/create-account',
   verifyBusinessAccount: '/auth/business/verify-email/:email',
   businessAccountVerified: '/auth/business/account-verified',
   businessSignIn: '/auth/business/sign-in',
 
-  // business account setup
+  // business onboarding
+  businessOnboarding: '/onboarding/business',
   businessPersonalDetails: '/onboarding/business/personal-details',
+  businessDetails: '/onboarding/business/details',
+  businessDirectorDetails: '/onboarding/business/director-details',
 };

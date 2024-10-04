@@ -13,7 +13,7 @@ import {
 import {Input} from '@/components/ui/input';
 import {PageHeader} from '@/components/layouts/account-setup-layout';
 
-export const BusinessPersonalDetails = () => {
+export const BusinessDirectorDetails = () => {
   const formSchema = z.object({
     first_name: z.string().min(1, {
       message: 'Please enter your CAC/RC Number',
@@ -28,6 +28,9 @@ export const BusinessPersonalDetails = () => {
     phone_number: z.string().min(1, {
       message: 'Please enter your phone number.',
     }),
+    address: z.string().min(1, {
+      message: 'Please enter your business address',
+    }),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -37,6 +40,7 @@ export const BusinessPersonalDetails = () => {
       last_name: '',
       email: '',
       phone_number: '',
+      address: '',
     },
   });
 
@@ -48,8 +52,8 @@ export const BusinessPersonalDetails = () => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="p-5">
         <PageHeader
-          title="Personal details"
-          subtitle="Give us more details about yourself"
+          title="Director's details"
+          subtitle="Give us more details about your business"
         />
 
         <div className="flex flex-col gap-8">
@@ -99,6 +103,19 @@ export const BusinessPersonalDetails = () => {
               render={({field}) => (
                 <FormItem>
                   <FormLabel>Phone Number</FormLabel>
+                  <FormControl>
+                    <Input {...field} className="h-12" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="address"
+              render={({field}) => (
+                <FormItem>
+                  <FormLabel>Address</FormLabel>
                   <FormControl>
                     <Input {...field} className="h-12" />
                   </FormControl>

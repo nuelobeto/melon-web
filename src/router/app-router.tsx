@@ -10,6 +10,9 @@ import {BusinessSignIn} from '@/pages/business/auth/business-sign-in';
 import {VerifyBusinessAccount} from '@/pages/business/auth/verify-business-account';
 import {BusinessAccountVerified} from '@/pages/business/auth/business-account-verified';
 import {BusinessPersonalDetails} from '@/pages/business/onboarding/business-personal-details';
+import {BusinessOnboarding} from '@/pages/business/onboarding/business-onboarding';
+import {BusinessDetails} from '@/pages/business/onboarding/business-details';
+import {BusinessDirectorDetails} from '@/pages/business/onboarding/business-director-details';
 
 const AppRouter = () => {
   return (
@@ -30,7 +33,7 @@ const AppRouter = () => {
       <Route path={ROUTES.downloadApp} element={<DowloadApp />} />
 
       {/* BUSINESS */}
-      {/* create account  */}
+      {/* Auth  */}
       <Route
         path={ROUTES.createBusinessAccount}
         element={<CreateBusinessAccount />}
@@ -44,10 +47,25 @@ const AppRouter = () => {
         path={ROUTES.businessAccountVerified}
         element={<BusinessAccountVerified />}
       />
-      <Route
-        path={ROUTES.businessPersonalDetails}
-        element={<BusinessPersonalDetails />}
-      />
+
+      {/* Onboarding */}
+      <Route path={ROUTES.businessOnboarding} element={<BusinessOnboarding />}>
+        <Route
+          path=""
+          element={
+            <Navigate to={ROUTES.businessPersonalDetails} replace={true} />
+          }
+        />
+        <Route
+          path={ROUTES.businessPersonalDetails}
+          element={<BusinessPersonalDetails />}
+        />
+        <Route path={ROUTES.businessDetails} element={<BusinessDetails />} />
+        <Route
+          path={ROUTES.businessDirectorDetails}
+          element={<BusinessDirectorDetails />}
+        />
+      </Route>
 
       <Route path={'/widget'} element={<WidgetTest />} />
     </Routes>
