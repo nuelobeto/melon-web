@@ -44,6 +44,21 @@ import {
 import {Input} from '@/components/ui/input';
 import {Button} from '@/components/ui/button';
 import {Badge} from '@/components/ui/badge';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {Download, EllipsisVerticalIcon, Eye} from 'lucide-react';
 
 export const Home = () => {
   return (
@@ -234,7 +249,7 @@ const data: TransactionT[] = [
   {
     id: '2',
     transaction_id: 'TX-5678',
-    name: 'Dian Prince',
+    name: 'Diana Prince',
     amount: '200000',
     date: formatDateToCustomTimestamp(new Date()),
     status: 'pending',
@@ -251,6 +266,19 @@ const data: TransactionT[] = [
 
 const RecentEngagements = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [openDetails, setOpenDetails] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<TransactionT | null>(null);
+
+  const handleOpenTransaction = (transaction: TransactionT) => {
+    setOpenDetails(true);
+    setSelectedTransaction(transaction);
+  };
+
+  const handleCloseTransaction = () => {
+    setOpenDetails(false);
+    setSelectedTransaction(null);
+  };
 
   const columns: ColumnDef<TransactionT>[] = [
     {
@@ -281,6 +309,37 @@ const RecentEngagements = () => {
         </Badge>
       ),
     },
+    {
+      id: 'actions',
+      enableHiding: false,
+      cell: ({row}) => {
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-8 h-8 hover:bg-neutral-50"
+              >
+                <EllipsisVerticalIcon className="w-5 h-5 text-pashBlack-7" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[213px]">
+              <DropdownMenuItem
+                onClick={() => handleOpenTransaction(row.original)}
+              >
+                <Eye className="w-5 h-5 mr-2" />
+                View details
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={e => e.stopPropagation()}>
+                <Download className="w-5 h-5 mr-2" />
+                Export
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
   ];
 
   const table = useReactTable({
@@ -293,104 +352,137 @@ const RecentEngagements = () => {
   });
 
   return (
-    <div className="mt-6">
-      <h3 className="font-semibold text-lg text-pashBlack-1">
-        Recent Engageents
-      </h3>
+    <>
+      <div className="mt-6">
+        <h3 className="font-semibold text-lg text-pashBlack-1">
+          Recent Engagements
+        </h3>
 
-      <div className="mt-4 flex flex-col gap-3">
-        <Input
-          placeholder="Search"
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-          className="w-full max-w-[400px]"
-        />
+        <div className="mt-4 flex flex-col gap-3">
+          <Input
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="w-full max-w-[400px]"
+          />
 
-        <div className="rounded-lg border border-mountainAsh-6 overflow-auto">
-          <div className="w-full min-w-[600px]">
-            <Table>
-              <TableHeader>
-                {table.getHeaderGroups().map(headerGroup => (
-                  <TableRow
-                    className="hover:bg-mountainAsh-8"
-                    key={headerGroup.id}
-                  >
-                    {headerGroup.headers.map(header => {
-                      return (
-                        <TableHead
-                          key={header.id}
-                          className="whitespace-nowrap"
-                        >
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
-                        </TableHead>
-                      );
-                    })}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map(row => (
+          <div className="rounded-lg border border-mountainAsh-6 overflow-auto">
+            <div className="w-full min-w-[600px]">
+              <Table>
+                <TableHeader>
+                  {table.getHeaderGroups().map(headerGroup => (
                     <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && 'selected'}
+                      className="hover:bg-mountainAsh-8"
+                      key={headerGroup.id}
                     >
-                      {row.getVisibleCells().map(cell => (
-                        <TableCell
-                          className={`whitespace-nowrap ${
-                            cell.column.id === 'actions'
-                              ? 'flex items-center justify-end'
-                              : ''
-                          }`}
-                          key={cell.id}
-                        >
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </TableCell>
-                      ))}
+                      {headerGroup.headers.map(header => {
+                        return (
+                          <TableHead
+                            key={header.id}
+                            className="whitespace-nowrap"
+                          >
+                            {header.isPlaceholder
+                              ? null
+                              : flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext(),
+                                )}
+                          </TableHead>
+                        );
+                      })}
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
-                      No results.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                  ))}
+                </TableHeader>
+                <TableBody>
+                  {table.getRowModel().rows?.length ? (
+                    table.getRowModel().rows.map(row => (
+                      <TableRow
+                        key={row.id}
+                        data-state={row.getIsSelected() && 'selected'}
+                        className="cursor-pointer"
+                        onClick={() => handleOpenTransaction(row.original)}
+                      >
+                        {row.getVisibleCells().map(cell => (
+                          <TableCell
+                            className={`whitespace-nowrap ${
+                              cell.column.id === 'actions'
+                                ? 'flex items-center justify-end'
+                                : ''
+                            }`}
+                            key={cell.id}
+                          >
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={columns.length}
+                        className="h-24 text-center"
+                      >
+                        No results.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end space-x-2 py-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              Next
+            </Button>
           </div>
         </div>
-
-        <div className="flex items-center justify-end space-x-2 py-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
       </div>
-    </div>
+      <TransactionDetails
+        open={openDetails}
+        onClose={handleCloseTransaction}
+        transaction={selectedTransaction}
+      />
+    </>
+  );
+};
+
+const TransactionDetails = ({
+  open,
+  onClose,
+  transaction,
+}: {
+  open: boolean;
+  onClose: () => void;
+  transaction: TransactionT | null;
+}) => {
+  return (
+    <Sheet open={open} onOpenChange={onClose}>
+      <SheetTrigger className="hidden"></SheetTrigger>
+      <SheetContent className="h-[calc(100%-48px)] my-auto w-full max-w-[600px] px-6 py-0 border-0 shadow-none bg-transparent">
+        <div className="w-full h-full bg-white rounded-lg">
+          <SheetHeader>
+            <SheetTitle>Transaction Details</SheetTitle>
+            <SheetDescription>{transaction?.name}</SheetDescription>
+          </SheetHeader>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 };
