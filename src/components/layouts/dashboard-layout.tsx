@@ -30,11 +30,13 @@ export const DashboardLayout = ({
       <div className="w-full min-[900px]w-[calc(100vw-256px)] h-full">
         <header className="w-full h-16 border-b border-mountainAsh-6 flex items-center justify-between px-5">
           <div className="flex items-center gap-4">
-            <MobileSidebar>
-              <button>
-                <HiOutlineMenuAlt2 className="text-2xl" />
-              </button>
-            </MobileSidebar>
+            <div className="min-[900px]:hidden">
+              <MobileSidebar>
+                <button>
+                  <HiOutlineMenuAlt2 className="text-2xl" />
+                </button>
+              </MobileSidebar>
+            </div>
             <h1 className="font-medium text-xl text-pashBlack-1">
               {pageTitle}
             </h1>
