@@ -132,8 +132,6 @@ export const BusinessDetails = () => {
     });
   }, [form]);
 
-  console.log(logo);
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="p-5">

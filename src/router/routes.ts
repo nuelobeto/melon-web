@@ -22,4 +22,7 @@ export const ROUTES = {
   // dashboard
   home: '/home',
   settings: '/settings',
+  businessSettngs: '/settings/business',
+  profileSettngs: '/settings/profile',
+  notificationSettngs: '/settings/guides',
 };

@@ -25,6 +25,13 @@ export type TransactionT = {
   amount: string;
   date: string;
   status: TransactionStatusT;
+  items: ItemT[];
+};
+
+export type ItemT = {
+  item: string;
+  quantity: string;
+  amount: string;
 };
 
 export type TransactionStatusT = 'received' | 'pending' | 'failed';

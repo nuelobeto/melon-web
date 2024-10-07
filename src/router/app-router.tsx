@@ -15,7 +15,10 @@ import {BusinessDetails} from '@/pages/business/onboarding/business-details';
 import {BusinessDirectorDetails} from '@/pages/business/onboarding/business-director-details';
 import {BusinessOnboardingSuccess} from '@/pages/business/onboarding/business-onboarding-success';
 import {Home} from '@/pages/business/dashboard/home';
-import {Settings} from '@/pages/business/dashboard/settings';
+import {Settings} from '@/pages/business/dashboard/settings/settings';
+import {ProfileSettings} from '@/pages/business/dashboard/settings/profile';
+import {BusinessSettings} from '@/pages/business/dashboard/settings/business';
+import {Guides} from '@/pages/business/dashboard/settings/guides';
 
 const AppRouter = () => {
   return (
@@ -76,7 +79,15 @@ const AppRouter = () => {
 
       {/* Dashboard */}
       <Route path={ROUTES.home} element={<Home />} />
-      <Route path={ROUTES.settings} element={<Settings />} />
+      <Route path={ROUTES.settings} element={<Settings />}>
+        <Route
+          path=""
+          element={<Navigate to={ROUTES.profileSettngs} replace={true} />}
+        />
+        <Route path={ROUTES.profileSettngs} element={<ProfileSettings />} />
+        <Route path={ROUTES.businessSettngs} element={<BusinessSettings />} />
+        <Route path={ROUTES.notificationSettngs} element={<Guides />} />
+      </Route>
 
       <Route path={'/widget'} element={<WidgetTest />} />
     </Routes>

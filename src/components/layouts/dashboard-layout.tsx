@@ -1,9 +1,10 @@
 import {Avatar, AvatarFallback, AvatarImage} from '@/components/ui/avatar';
-import {BellIcon, HomeIcon, SettingsIcon} from '../ui/icons';
+import {HomeIcon, SettingsIcon} from '../ui/icons';
 import {NavLink} from 'react-router-dom';
 import {cn} from '@/lib/utils';
 import {ROUTES} from '@/router/routes';
 import {ScrollArea} from '../ui/scroll-area';
+import {RiNotification3Line} from 'react-icons/ri';
 
 export const DashboardLayout = ({
   children,
@@ -20,7 +21,7 @@ export const DashboardLayout = ({
           <h1 className="font-medium text-xl text-pashBlack-1">{pageTitle}</h1>
           <div className="flex items-center gap-4">
             <div className="w-11 h-11 rounded-full bg-mountainAsh-8 flex items-center justify-center">
-              <BellIcon />
+              <RiNotification3Line className="text-2xl" />
             </div>
             <div className="w-11 h-11 rounded-full">
               <Avatar className="w-full h-full">
@@ -31,9 +32,7 @@ export const DashboardLayout = ({
           </div>
         </header>
         <main className="w-full h-[calc(100%-64px)]">
-          <ScrollArea className="w-full h-full">
-            <div className="p-6">{children}</div>
-          </ScrollArea>
+          <ScrollArea className="w-full h-full">{children}</ScrollArea>
         </main>
       </div>
     </div>

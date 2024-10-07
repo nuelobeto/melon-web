@@ -46,6 +46,7 @@ import {Button} from '@/components/ui/button';
 import {Badge} from '@/components/ui/badge';
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetDescription,
   SheetHeader,
@@ -58,36 +59,39 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {Download, EllipsisVerticalIcon, Eye} from 'lucide-react';
+import {Download, EllipsisVerticalIcon, Eye, X} from 'lucide-react';
+import {ScrollArea} from '@/components/ui/scroll-area';
 
 export const Home = () => {
   return (
     <DashboardLayout pageTitle="Dashboard">
-      <div className="w-full rounded-xl bg-mustard-8 px-6 sm:px-12 p-6 flex flex-col md:flex-row items-center gap-6">
-        <img
-          src="/images/campaign-coming-soon.png"
-          alt=""
-          width={150}
-          className="w-[100px] md:w-[150px] h-auto"
-        />
-        <div className="flex flex-col max-w-[600px] gap-2">
-          <h2 className="font-semibold text-2xl text-center md:text-left">
-            Campaigns Coming Soon!
-          </h2>
-          <p className="text-sm md:text-base text-center text-pashBlack-3 md:text-left">
-            Something big is on the horizon! Our upcoming campaign is set to
-            launch soon, and you won’t want to miss out. Stay tuned for
-            exclusive offers and exciting surprises!
-          </p>
+      <div className="p-5">
+        <div className="w-full rounded-xl bg-mustard-8 px-6 sm:px-12 p-6 flex flex-col md:flex-row items-center gap-6">
+          <img
+            src="/images/campaign-coming-soon.png"
+            alt=""
+            width={150}
+            className="w-[100px] md:w-[150px] h-auto"
+          />
+          <div className="flex flex-col max-w-[600px] gap-2">
+            <h2 className="font-semibold text-2xl text-center md:text-left">
+              Campaigns Coming Soon!
+            </h2>
+            <p className="text-sm md:text-base text-center text-pashBlack-3 md:text-left">
+              Something big is on the horizon! Our upcoming campaign is set to
+              launch soon, and you won’t want to miss out. Stay tuned for
+              exclusive offers and exciting surprises!
+            </p>
+          </div>
         </div>
-      </div>
 
-      <div className="flex flex-col min-[1100px]:flex-row gap-4 mt-8">
-        <TotalPatronage />
-        <Overview />
-      </div>
+        <div className="flex flex-col min-[1100px]:flex-row gap-4 mt-8">
+          <TotalPatronage />
+          <Overview />
+        </div>
 
-      <RecentEngagements />
+        <RecentEngagements />
+      </div>
     </DashboardLayout>
   );
 };
@@ -228,8 +232,8 @@ const Overview = () => {
             key={index}
             className="py-4 border-b border-mountainAsh-7 flex items-center justify-between"
           >
-            <p className="text-pashBlack-1">{customer.label}</p>
-            <p className="text-pashBlack-1">{customer.value}</p>
+            <p className="text-pashBlack-1 text-sm">{customer.label}</p>
+            <p className="text-pashBlack-1 text-sm">{customer.value}</p>
           </div>
         ))}
       </CardContent>
@@ -245,6 +249,18 @@ const data: TransactionT[] = [
     amount: '100000',
     date: formatDateToCustomTimestamp(new Date()),
     status: 'received',
+    items: [
+      {
+        item: 'Spaghetti',
+        quantity: '10',
+        amount: '10,000',
+      },
+      {
+        item: 'Bread',
+        quantity: '2',
+        amount: '3,200',
+      },
+    ],
   },
   {
     id: '2',
@@ -253,6 +269,18 @@ const data: TransactionT[] = [
     amount: '200000',
     date: formatDateToCustomTimestamp(new Date()),
     status: 'pending',
+    items: [
+      {
+        item: 'Spaghetti',
+        quantity: '10',
+        amount: '10,000',
+      },
+      {
+        item: 'Bread',
+        quantity: '2',
+        amount: '3,200',
+      },
+    ],
   },
   {
     id: '3',
@@ -261,6 +289,18 @@ const data: TransactionT[] = [
     amount: '150000',
     date: formatDateToCustomTimestamp(new Date()),
     status: 'failed',
+    items: [
+      {
+        item: 'Spaghetti',
+        quantity: '10',
+        amount: '10,000',
+      },
+      {
+        item: 'Bread',
+        quantity: '2',
+        amount: '3,200',
+      },
+    ],
   },
 ];
 
@@ -477,10 +517,76 @@ const TransactionDetails = ({
       <SheetTrigger className="hidden"></SheetTrigger>
       <SheetContent className="h-[calc(100%-48px)] my-auto w-full max-w-[600px] px-6 py-0 border-0 shadow-none bg-transparent">
         <div className="w-full h-full bg-white rounded-lg">
-          <SheetHeader>
+          <SheetHeader className="flex-row items-center px-5 h-[64px] border-b border-mountainAsh-6 justify-between space-y-0">
             <SheetTitle>Transaction Details</SheetTitle>
-            <SheetDescription>{transaction?.name}</SheetDescription>
+            <SheetClose asChild>
+              <Button
+                size={'icon'}
+                variant={'secondary'}
+                className="w-8 h-8 rounded-full"
+              >
+                <X className="w-4 h-4 text-pashBlack-6" />
+              </Button>
+            </SheetClose>
+            <SheetDescription className="hidden"></SheetDescription>
           </SheetHeader>
+
+          <ScrollArea className="h-[calc(100%-64px)]">
+            <div className="p-5">
+              <div className="flex flex-col gap-2">
+                <h2 className="text-pashBlack-1 text-base">
+                  Transaction ID: {transaction?.transaction_id}
+                </h2>
+                <p className="text-pashBlack-1 text-sm">
+                  Customer Name: {transaction?.name}
+                </p>
+                <p className="text-pashBlack-1 text-sm">
+                  Date: {transaction?.date}
+                </p>
+                <p className="text-pashBlack-1 text-sm">
+                  Transaction Status:{' '}
+                  <Badge variant={transaction?.status} className=" capitalize">
+                    {transaction?.status}
+                  </Badge>
+                </p>
+              </div>
+
+              <div className="w-full overflow-auto mt-6">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="whitespace-nowrap">S/N</TableHead>
+                      <TableHead className="whitespace-nowrap">Item</TableHead>
+                      <TableHead className="whitespace-nowrap">
+                        Quantity
+                      </TableHead>
+                      <TableHead className="whitespace-nowrap">
+                        Amount
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {transaction?.items.map((item, index) => (
+                      <TableRow key={index}>
+                        <TableCell className="whitespace-nowrap">
+                          {index + 1}
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap">
+                          {item.item}
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap">
+                          {item.quantity}
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap">
+                          NGN {item.amount}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          </ScrollArea>
         </div>
       </SheetContent>
     </Sheet>
