@@ -1,6 +1,6 @@
 import {AuthLayout, Main, SideBar} from '@/components/layouts/auth-layout';
 import {Button} from '@/components/ui/button';
-import {Link, useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import {ROUTES} from '@/router/routes';
 
 export const BusinessAccountVerified = () => {
@@ -17,18 +17,11 @@ export const BusinessAccountVerified = () => {
       </SideBar>
       <Main>
         <div className="flex flex-col gap-6">
-          <img
-            src="/images/create-account-success.png"
-            alt=""
-            width={100}
-            height={100}
-            className="block mx-auto"
-          />
           <div className="flex flex-col gap-2">
-            <h1 className="font-semibold text-4xl text-pashBlack-1 text-center">
+            <h1 className="font-semibold text-3xl text-pashBlack-1 text-center">
               Account created successfully
             </h1>
-            <p className="text-base text-pashBlack-3 text-center">
+            <p className="text-sm text-pashBlack-3 text-center">
               Hi Sundry foods, your Melon account has been created successfully.
               A member of our sales team would reach out to you and help you
               with the next steps. For now you can log Into your dashboard
@@ -43,15 +36,6 @@ export const BusinessAccountVerified = () => {
             >
               Log In
             </Button>
-            <p className="font-medium text-sm text-pashBlack-4 text-center">
-              New to Melon?{' '}
-              <Link
-                to={ROUTES.createBusinessAccount}
-                className="text-darkLime-5"
-              >
-                Create an ccount
-              </Link>
-            </p>
           </div>
         </div>
       </Main>

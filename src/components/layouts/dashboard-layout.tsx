@@ -16,6 +16,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import {X} from 'lucide-react';
+import {RiGiftLine, RiBarChartLine} from 'react-icons/ri';
 
 export const DashboardLayout = ({
   children,
@@ -76,6 +77,22 @@ const navlinks = [
       <SettingsIcon className={className ? className : ''} />
     ),
   },
+  {
+    label: 'Insights',
+    url: 'insights',
+    icon: (className?: string) => (
+      <RiBarChartLine className={className ? className : ''} />
+    ),
+    comingSoon: true,
+  },
+  {
+    label: 'Offers',
+    url: 'offers',
+    icon: (className?: string) => (
+      <RiGiftLine className={cn('text-xl', className)} />
+    ),
+    comingSoon: true,
+  },
 ];
 
 export const SideBar = () => {
@@ -96,30 +113,53 @@ export const SideBar = () => {
 
       <div className="flex flex-col gap-1 px-5 mt-11">
         {navlinks.map((link, index) => (
-          <NavLink
-            key={index}
-            to={link.url}
-            className={({isActive}) =>
-              cn(
-                'px-4 h-12 rounded-xl flex items-center gap-2.5 hover:bg-pashBlack-2/50',
-                isActive && 'bg-pashBlack-2',
-              )
-            }
-          >
-            {({isActive}) => (
-              <>
-                {link.icon(isActive ? 'fill-white' : 'fill-pashBlack-8')}
-                <span
-                  className={cn(
-                    'text-sm',
-                    isActive ? 'text-white' : 'text-pashBlack-8',
-                  )}
-                >
-                  {link.label}
-                </span>
-              </>
+          <div key={index}>
+            {!link.comingSoon && (
+              <NavLink
+                key={index}
+                to={link.url}
+                className={({isActive}) =>
+                  cn(
+                    'px-4 h-12 rounded-xl flex items-center gap-2.5 hover:bg-pashBlack-2/50',
+                    isActive && 'bg-pashBlack-2',
+                  )
+                }
+              >
+                {({isActive}) => (
+                  <>
+                    {link.icon(isActive ? 'fill-white' : 'fill-pashBlack-8')}
+                    <span
+                      className={cn(
+                        'text-sm',
+                        isActive ? 'text-white' : 'text-pashBlack-8',
+                      )}
+                    >
+                      {link.label}
+                    </span>
+                    {link.comingSoon && (
+                      <span className="text-[8px] text-pink-1 p-1 rounded-[4px] bg-pink-2/30">
+                        Coming soon
+                      </span>
+                    )}
+                  </>
+                )}
+              </NavLink>
             )}
-          </NavLink>
+
+            {link.comingSoon && (
+              <NavLink
+                key={index}
+                to={link.url}
+                className="px-4 h-12 rounded-xl flex items-center gap-2.5 pointer-events-none"
+              >
+                {link.icon('fill-pashBlack-3')}
+                <span className="text-sm text-pashBlack-3">{link.label}</span>
+                <span className="text-[8px] text-pink-1 p-1 rounded-[4px] bg-pink-2/30">
+                  Coming soon
+                </span>
+              </NavLink>
+            )}
+          </div>
         ))}
       </div>
     </aside>

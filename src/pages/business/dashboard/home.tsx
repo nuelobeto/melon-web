@@ -41,7 +41,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {Input} from '@/components/ui/input';
 import {Button} from '@/components/ui/button';
 import {Badge} from '@/components/ui/badge';
 import {
@@ -65,34 +64,55 @@ import {ScrollArea} from '@/components/ui/scroll-area';
 export const Home = () => {
   return (
     <DashboardLayout pageTitle="Dashboard">
-      <div className="p-5">
-        <div className="w-full rounded-xl bg-mustard-8 px-6 sm:px-12 p-6 flex flex-col md:flex-row items-center gap-6">
-          <img
-            src="/images/campaign-coming-soon.png"
-            alt=""
-            width={150}
-            className="w-[100px] md:w-[150px] h-auto"
-          />
-          <div className="flex flex-col max-w-[600px] gap-2">
-            <h2 className="font-semibold text-2xl text-center md:text-left">
-              Campaigns Coming Soon!
-            </h2>
-            <p className="text-sm md:text-base text-center text-pashBlack-3 md:text-left">
-              Something big is on the horizon! Our upcoming campaign is set to
-              launch soon, and you won’t want to miss out. Stay tuned for
-              exclusive offers and exciting surprises!
-            </p>
-          </div>
-        </div>
+      <OffersBanner />
 
-        <div className="flex flex-col min-[1100px]:flex-row gap-4 mt-8">
-          <TotalPatronage />
-          <Overview />
-        </div>
-
-        <RecentEngagements />
+      <div className="flex flex-col min-[1100px]:flex-row gap-4 mt-8 px-5">
+        <TotalPatronage />
+        <Overview />
       </div>
+
+      <RecentEngagements />
     </DashboardLayout>
+  );
+};
+
+const OffersBanner = () => {
+  return (
+    <div className="md:pt-5 md:px-5">
+      <div className="w-full md:rounded-xl bg-gradient-to-r from-pink-400 via-pink-500 to-red-500 px-6 sm:px-12 p-6 flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          {[...Array(24)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-3 h-5 bg-black rounded-full transform rotate-45"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+            />
+          ))}
+        </div>
+        <img
+          src="/images/campaign-coming-soon.png"
+          alt=""
+          width={150}
+          className="w-[100px] md:w-[150px] h-auto"
+        />
+        <div className="flex flex-col max-w-[600px] gap-2">
+          <h2 className="font-semibold text-2xl text-white text-center md:text-left">
+            Offers Coming Soon!
+          </h2>
+          <p className="text-sm md:text-base text-center text-white md:text-left">
+            Something big is on the horizon! Our upcoming campaign is set to
+            launch soon, and you won’t want to miss out. Stay tuned for
+            exclusive offers and exciting surprises!
+          </p>
+          <Button className="w-full md:w-fit mt-2 relative z-10">
+            Learn more
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -305,7 +325,6 @@ const data: TransactionT[] = [
 ];
 
 const RecentEngagements = () => {
-  const [searchQuery, setSearchQuery] = useState('');
   const [openDetails, setOpenDetails] = useState(false);
   const [selectedTransaction, setSelectedTransaction] =
     useState<TransactionT | null>(null);
@@ -393,104 +412,76 @@ const RecentEngagements = () => {
 
   return (
     <>
-      <div className="mt-6">
+      <div className="mt-6 px-5 mb-16">
         <h3 className="font-semibold text-lg text-pashBlack-1">
           Recent Engagements
         </h3>
 
-        <div className="mt-4 flex flex-col gap-3">
-          <Input
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            className="w-full max-w-[400px]"
-          />
-
-          <div className="rounded-lg border border-mountainAsh-6 overflow-auto">
-            <div className="w-full min-w-[600px]">
-              <Table>
-                <TableHeader>
-                  {table.getHeaderGroups().map(headerGroup => (
+        <div className="mt-4 rounded-lg border border-mountainAsh-6 overflow-auto">
+          <div className="w-full min-w-[600px]">
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map(headerGroup => (
+                  <TableRow
+                    className="hover:bg-mountainAsh-8"
+                    key={headerGroup.id}
+                  >
+                    {headerGroup.headers.map(header => {
+                      return (
+                        <TableHead
+                          key={header.id}
+                          className="whitespace-nowrap"
+                        >
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
+                        </TableHead>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map(row => (
                     <TableRow
-                      className="hover:bg-mountainAsh-8"
-                      key={headerGroup.id}
+                      key={row.id}
+                      data-state={row.getIsSelected() && 'selected'}
+                      className="cursor-pointer"
+                      onClick={() => handleOpenTransaction(row.original)}
                     >
-                      {headerGroup.headers.map(header => {
-                        return (
-                          <TableHead
-                            key={header.id}
-                            className="whitespace-nowrap"
-                          >
-                            {header.isPlaceholder
-                              ? null
-                              : flexRender(
-                                  header.column.columnDef.header,
-                                  header.getContext(),
-                                )}
-                          </TableHead>
-                        );
-                      })}
+                      {row.getVisibleCells().map(cell => (
+                        <TableCell
+                          className={`whitespace-nowrap ${
+                            cell.column.id === 'actions'
+                              ? 'flex items-center justify-end'
+                              : ''
+                          }`}
+                          key={cell.id}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      ))}
                     </TableRow>
-                  ))}
-                </TableHeader>
-                <TableBody>
-                  {table.getRowModel().rows?.length ? (
-                    table.getRowModel().rows.map(row => (
-                      <TableRow
-                        key={row.id}
-                        data-state={row.getIsSelected() && 'selected'}
-                        className="cursor-pointer"
-                        onClick={() => handleOpenTransaction(row.original)}
-                      >
-                        {row.getVisibleCells().map(cell => (
-                          <TableCell
-                            className={`whitespace-nowrap ${
-                              cell.column.id === 'actions'
-                                ? 'flex items-center justify-end'
-                                : ''
-                            }`}
-                            key={cell.id}
-                          >
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext(),
-                            )}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={columns.length}
-                        className="h-24 text-center"
-                      >
-                        No results.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-end space-x-2 py-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              Next
-            </Button>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center"
+                    >
+                      No results.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           </div>
         </div>
       </div>

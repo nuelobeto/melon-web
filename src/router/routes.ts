@@ -24,5 +24,7 @@ export const ROUTES = {
   settings: '/settings',
   businessSettngs: '/settings/business',
   profileSettngs: '/settings/profile',
-  notificationSettngs: '/settings/guides',
+  guides: '/settings/guides',
+  webWidgetIntegration: '/settings/guides/web',
+  mobileWidgetIntegration: '/settings/guides/mobile',
 };

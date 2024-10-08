@@ -20,7 +20,7 @@ export const Settings = () => {
     },
     {
       label: 'Guides',
-      url: ROUTES.notificationSettngs,
+      url: ROUTES.guides,
       icon: (className?: string) => <RiBook2Line className={className} />,
     },
   ];

@@ -18,7 +18,9 @@ import {Home} from '@/pages/business/dashboard/home';
 import {Settings} from '@/pages/business/dashboard/settings/settings';
 import {ProfileSettings} from '@/pages/business/dashboard/settings/profile';
 import {BusinessSettings} from '@/pages/business/dashboard/settings/business';
-import {Guides} from '@/pages/business/dashboard/settings/guides';
+import {Guides} from '@/pages/business/dashboard/settings/guides/guides';
+import {WebGuide} from '@/pages/business/dashboard/settings/guides/web-guide';
+import {MobileGuide} from '@/pages/business/dashboard/settings/guides/mobile-guide';
 
 const AppRouter = () => {
   return (
@@ -86,7 +88,19 @@ const AppRouter = () => {
         />
         <Route path={ROUTES.profileSettngs} element={<ProfileSettings />} />
         <Route path={ROUTES.businessSettngs} element={<BusinessSettings />} />
-        <Route path={ROUTES.notificationSettngs} element={<Guides />} />
+        <Route path={ROUTES.guides} element={<Guides />}>
+          <Route
+            path=""
+            element={
+              <Navigate to={ROUTES.webWidgetIntegration} replace={true} />
+            }
+          />
+          <Route path={ROUTES.webWidgetIntegration} element={<WebGuide />} />
+          <Route
+            path={ROUTES.mobileWidgetIntegration}
+            element={<MobileGuide />}
+          />
+        </Route>
       </Route>
 
       <Route path={'/widget'} element={<WidgetTest />} />
