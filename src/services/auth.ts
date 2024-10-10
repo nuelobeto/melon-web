@@ -1,5 +1,5 @@
 import apiClient from '@/config/axiosInstance';
-import {CreateAccountT} from '@/types';
+import {CreateAccountT, CreateBusinessT, LoginT} from '@/types';
 
 const verifyEmail = async (token: string) => {
   const res = await apiClient.get(`/users/email-verified/${token}`);
@@ -31,6 +31,29 @@ const resendOtp = async (phone_number: string) => {
   return res.data;
 };
 
+const createBusinessAccount = async (payload: CreateBusinessT) => {
+  const res = await apiClient.post('/businesses', payload);
+  return res.data;
+};
+
+const login = async (payload: LoginT) => {
+  const res = await apiClient.post('/auth/login-member', payload);
+  localStorage.setItem('user', JSON.stringify(res.data.data.member));
+  localStorage.setItem('token', JSON.stringify(res.data.data.token));
+
+  return res.data;
+};
+
+const resendBusinessEmailOtp = async (email: string) => {
+  const res = await apiClient.get(`/businesses/resend-verification/${email}`);
+  return res.data;
+};
+
+const verifyBusinessEmail = async (token: string) => {
+  const res = await apiClient.get(`/businesses/verify-email/${token}`);
+  return res.data;
+};
+
 const authServices = {
   verifyEmail,
   resendEmailOtp,
@@ -38,6 +61,10 @@ const authServices = {
   verifyPhone,
   getReferralDetails,
   resendOtp,
+  createBusinessAccount,
+  login,
+  resendBusinessEmailOtp,
+  verifyBusinessEmail,
 };
 
 export default authServices;

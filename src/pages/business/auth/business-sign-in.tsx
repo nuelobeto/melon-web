@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {AuthLayout, Main, SideBar} from '@/components/layouts/auth-layout';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useForm} from 'react-hook-form';
@@ -15,6 +16,14 @@ import {Input} from '@/components/ui/input';
 
 import {Link, useNavigate} from 'react-router-dom';
 import {ROUTES} from '@/router/routes';
+import {Loader2} from 'lucide-react';
+import {ApiResponseT, LoginT} from '@/types';
+import {useEffect, useState} from 'react';
+import authServices from '@/services/auth';
+import {toast} from 'react-toastify';
+import {useAuth} from '@/store/useAuth';
+import {useFetchBusiness} from '@/hooks/business';
+import {useBusiness} from '@/store/useBusiness';
 
 export const BusinessSignIn = () => {
   return (
@@ -34,7 +43,12 @@ export const BusinessSignIn = () => {
 };
 
 const RegistrationForm = () => {
+  const {setUser} = useAuth();
+  const {business} = useBusiness();
+
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const formSchema = z.object({
     business_email: z
@@ -55,10 +69,52 @@ const RegistrationForm = () => {
     mode: 'onBlur',
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    navigate(ROUTES.businessPersonalDetails);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const payload: LoginT = {
+      email: values.business_email,
+      password: values.password,
+    };
+
+    setLoading(true);
+    try {
+      const res: ApiResponseT = await authServices.login(payload);
+
+      if (res.status === 'success') {
+        setLoading(false);
+        setSuccess(true);
+        setUser(res.data.member);
+        toast.success(res.message);
+      }
+    } catch (error: any) {
+      setLoading(false);
+      toast.error(error.response?.data?.message ?? 'Error logging in');
+    }
   }
+
+  useFetchBusiness();
+
+  useEffect(() => {
+    if (!success || !business) return;
+
+    setSuccess(false);
+
+    if (!business.profile_completed) {
+      navigate(ROUTES.businessOnboarding);
+    } else if (
+      business.profile_completed &&
+      !business.director_phone_verified
+    ) {
+      const savedDirectorPhone: string | null =
+        localStorage.getItem('director-phone');
+      const directorPhone: string = savedDirectorPhone
+        ? JSON.parse(savedDirectorPhone)
+        : '';
+
+      navigate(ROUTES.verifyDirectorPhone.replace(':phone', directorPhone));
+    } else {
+      navigate(ROUTES.home);
+    }
+  }, [business, navigate, success]);
 
   return (
     <Form {...form}>
@@ -114,8 +170,8 @@ const RegistrationForm = () => {
         </div>
 
         <div className="flex flex-col items-center gap-2">
-          <Button type="submit" className="h-12 w-full">
-            Log In
+          <Button type="submit" className="h-12 w-full" disabled={loading}>
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Log In'}
           </Button>
           <p className="font-medium text-sm text-pashBlack-4 text-center">
             New to Melon?{' '}

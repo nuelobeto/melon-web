@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
@@ -12,8 +13,26 @@ import {
 } from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {PageHeader} from '@/components/layouts/account-setup-layout';
+import {useBusiness} from '@/store/useBusiness';
+import {ApiResponseT, CountryCodeType, UpdatePersonalDetailsT} from '@/types';
+import {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {ROUTES} from '@/router/routes';
+import {CountryCode} from '@/components/ui/country-code';
+import businessServices from '@/services/business';
+import {useAuth} from '@/store/useAuth';
+import {toast} from 'react-toastify';
+import {useFetchPersonalDetails} from '@/hooks/business';
+import {Loader2} from 'lucide-react';
 
 export const BusinessPersonalDetails = () => {
+  const {user} = useAuth();
+  const {personalDetails} = useBusiness();
+  const navigate = useNavigate();
+  const [selectedCountryCode, setSelectedCountryCode] =
+    useState<CountryCodeType | null>(null);
+  const [loading, setLoading] = useState(false);
+
   const formSchema = z.object({
     first_name: z.string().min(1, {
       message: 'Please enter your first name',
@@ -40,9 +59,53 @@ export const BusinessPersonalDetails = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!user) {
+      return;
+    }
+
+    const payload: UpdatePersonalDetailsT = {
+      first_name: values.first_name,
+      last_name: values.last_name,
+      phone_number: `${
+        selectedCountryCode?.callingCode
+      }${values.phone_number.slice(1)}`,
+      email: values.email,
+    };
+
+    setLoading(true);
+    try {
+      const res: ApiResponseT = await businessServices.updatePersonalDetails(
+        payload,
+        user?.member_id,
+      );
+      if (res.status === 'success') {
+        setLoading(false);
+        toast.success(res.message);
+        navigate(ROUTES.businessDetails);
+      }
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+      setLoading(false);
+    }
   }
+
+  useEffect(() => {
+    form.reset({
+      email: personalDetails?.email ?? '',
+      first_name: personalDetails?.first_name ?? '',
+      last_name: personalDetails?.last_name ?? '',
+      phone_number: personalDetails?.phone_number ?? '',
+    });
+  }, [
+    personalDetails?.email,
+    personalDetails?.first_name,
+    personalDetails?.last_name,
+    personalDetails?.phone_number,
+    form,
+  ]);
+
+  useFetchPersonalDetails();
 
   return (
     <Form {...form}>
@@ -87,7 +150,7 @@ export const BusinessPersonalDetails = () => {
                 <FormItem>
                   <FormLabel>Email Address</FormLabel>
                   <FormControl>
-                    <Input {...field} className="h-12" />
+                    <Input {...field} className="h-12" disabled />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -100,7 +163,19 @@ export const BusinessPersonalDetails = () => {
                 <FormItem>
                   <FormLabel>Phone Number</FormLabel>
                   <FormControl>
-                    <Input {...field} className="h-12" />
+                    <div className="relative flex items-center">
+                      <CountryCode
+                        selectedCountryCode={selectedCountryCode}
+                        setSelectedCountryCode={setSelectedCountryCode}
+                      />
+                      <Input
+                        type="tel"
+                        placeholder="Enter your phone number"
+                        className="pl-16 h-12"
+                        {...field}
+                        maxLength={11}
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -109,8 +184,12 @@ export const BusinessPersonalDetails = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Button type="submit" size={'lg'}>
-              Continue
+            <Button type="submit" size={'lg'} disabled={loading}>
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                'Continue'
+              )}
             </Button>
           </div>
         </div>

@@ -11,21 +11,21 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import {InputOTP, InputOTPGroup, InputOTPSlot} from '@/components/ui/input-otp';
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {toast} from 'react-toastify';
-import authServices from '@/services/auth';
 import {ROUTES} from '@/router/routes';
 import {Loader2} from 'lucide-react';
+import {ApiResponseT} from '@/types';
+import businessServices from '@/services/business';
 import {LogoBlack} from '@/components/ui/logo';
 
-export const VerifyPhoneMobile = () => {
+export const VerifyDirectorPhone = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [resendingOtp, setResendingOtp] = useState(false);
   const params = useParams();
   const phone = params.phone;
-  const otpCode = params.otp;
 
   const formSchema = z.object({
     otp: z.string().min(2, {
@@ -47,10 +47,11 @@ export const VerifyPhoneMobile = () => {
   const verifyPhone = async (otp: string) => {
     setLoading(true);
     try {
-      const res = await authServices.verifyPhone(otp);
+      const res: ApiResponseT = await businessServices.verifyDirectorPhone(otp);
       if (res.status === 'success') {
         setLoading(false);
-        navigate(ROUTES.downloadApp);
+        toast.success(res.message);
+        navigate(ROUTES.businessOnboardingSuccess);
       }
     } catch (error: any) {
       toast.error(error.response.data.message);
@@ -62,9 +63,10 @@ export const VerifyPhoneMobile = () => {
     if (phone) {
       setResendingOtp(true);
       try {
-        const res = await authServices.resendOtp(phone);
+        const res: ApiResponseT = await businessServices.resendOtp(phone);
         if (res.status === 'success') {
           setResendingOtp(false);
+          toast.success(res.message);
         }
       } catch (error: any) {
         toast.error(error.response.data.message);
@@ -72,14 +74,6 @@ export const VerifyPhoneMobile = () => {
       }
     }
   };
-
-  useEffect(() => {
-    if (otpCode) {
-      form.reset({
-        otp: otpCode,
-      });
-    }
-  }, [form, otpCode]);
 
   return (
     <div className="w-screen h-screen bg-white">

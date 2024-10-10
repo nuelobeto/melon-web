@@ -23,7 +23,6 @@ import {CountryCode} from '@/components/ui/country-code';
 
 export const EnterPhone = () => {
   const [referrer, setReferrer] = useState('');
-  const [countryCodes, setCountryCodes] = useState<CountryCodeType[]>([]);
   const [selectedCountryCode, setSelectedCountryCode] =
     useState<CountryCodeType | null>(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
@@ -98,15 +97,6 @@ export const EnterPhone = () => {
     }
   }, [refCode]);
 
-  useEffect(() => {
-    if (countryCodes.length > 0 && !selectedCountryCode) {
-      const nigeria = countryCodes.find(country => country.name === 'Nigeria');
-      if (nigeria) {
-        setSelectedCountryCode(nigeria);
-      }
-    }
-  }, [countryCodes, selectedCountryCode]);
-
   return (
     <div className="w-screen h-screen bg-white flex items-center justify-center px-5 py-16">
       {detailsLoading && (
@@ -137,8 +127,6 @@ export const EnterPhone = () => {
                     <FormControl>
                       <div className="relative flex items-center">
                         <CountryCode
-                          setCountryCodes={setCountryCodes}
-                          countryCodes={countryCodes}
                           selectedCountryCode={selectedCountryCode}
                           setSelectedCountryCode={setSelectedCountryCode}
                         />

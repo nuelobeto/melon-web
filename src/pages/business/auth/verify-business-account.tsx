@@ -1,10 +1,36 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {AuthLayout, Main, SideBar} from '@/components/layouts/auth-layout';
-import {CheckCircle} from 'lucide-react';
+import authServices from '@/services/auth';
+import {ApiResponseT} from '@/types';
+import {CheckCircle, Loader2} from 'lucide-react';
+import {useState} from 'react';
 import {useParams} from 'react-router-dom';
+import {toast} from 'react-toastify';
 
 export const VerifyBusinessAccount = () => {
   const params = useParams();
   const email = params.email;
+  const [loading, setLoading] = useState(false);
+
+  const handleResendEmail = async () => {
+    if (!email) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res: ApiResponseT = await authServices.resendBusinessEmailOtp(
+        email,
+      );
+      if (res.status === 'success') {
+        setLoading(false);
+        toast.success(res.message);
+      }
+    } catch (error: any) {
+      setLoading(false);
+      toast.error(error.response?.data?.message ?? 'Error sending link');
+    }
+  };
 
   return (
     <AuthLayout>
@@ -30,9 +56,15 @@ export const VerifyBusinessAccount = () => {
             </p>
           </div>
 
-          <p className="font-medium text-sm text-pashBlack-4 text-center">
+          <p className="font-medium text-sm text-pashBlack-4 text-center flex items-center justify-center gap-1">
             Didn't get the link?{' '}
-            <button className="text-darkLime-5 text-base">Resend</button>
+            <button
+              className="text-darkLime-5 text-base"
+              onClick={handleResendEmail}
+              disabled={loading}
+            >
+              {loading ? <Loader2 className="animate-spin" /> : 'Resend'}
+            </button>
           </p>
         </div>
       </Main>

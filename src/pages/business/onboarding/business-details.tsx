@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
@@ -34,11 +35,21 @@ import {ChevronDown, Loader2, X} from 'lucide-react';
 import {Checkbox} from '@/components/ui/checkbox';
 import {AiOutlineCloudUpload} from 'react-icons/ai';
 import {FileUpload} from '@/components/ui/file-upload';
-import {FileType} from '@/types';
+import {ApiResponseT, FileType, UpdateBusinessDetailsT} from '@/types';
+import {useBusiness} from '@/store/useBusiness';
+import {useNavigate} from 'react-router-dom';
+import {ROUTES} from '@/router/routes';
+import {BUSINESS_CHANNELS, INDUSTRIES} from '@/constants';
+import {toast} from 'react-toastify';
+import businessServices from '@/services/business';
+import {useFetchBusiness} from '@/hooks/business';
 
 export const BusinessDetails = () => {
   const [logo, setLogo] = useState<FileType | null>(null);
   const [logoLoading, setLogoLoading] = useState(false);
+  const {business} = useBusiness();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const formSchema = z.object({
     business_logo: z.string().optional(),
@@ -79,6 +90,9 @@ export const BusinessDetails = () => {
     state: z.string().min(1, {
       message: 'Please enter your state',
     }),
+    country: z.string().min(1, {
+      message: 'Please enter your country',
+    }),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -86,9 +100,9 @@ export const BusinessDetails = () => {
     defaultValues: {
       business_logo: '',
       cac_rc_number: '',
-      business_name: '',
-      business_email: '',
-      phone_number: '',
+      business_name: business?.name ?? '',
+      business_email: business?.business_email ?? '',
+      phone_number: business?.phone_number ?? '',
       industry: '',
       channel: '',
       online_platforms: [],
@@ -97,11 +111,46 @@ export const BusinessDetails = () => {
       facebook: '',
       address: '',
       state: '',
+      country: '',
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!business) {
+      return;
+    }
+
+    const payload: UpdateBusinessDetailsT = {
+      logo: logo?.url ?? null,
+      state: values.state,
+      channel: values.channel,
+      address: values.address,
+      country: values.country,
+      facebook: values.facebook,
+      industry: values.industry,
+      instagram: `@${values.instagram}`,
+      rc_number: values.cac_rc_number,
+      website_link: `https://${values.website}`,
+      phone_number: values.phone_number,
+      name: values.business_name,
+      online_channel: values.online_platforms,
+    };
+
+    setLoading(true);
+    try {
+      const res: ApiResponseT = await businessServices.updateBusinessDetails(
+        payload,
+        business.id,
+      );
+      if (res.status === 'success') {
+        setLoading(false);
+        toast.success(res.message);
+        navigate(ROUTES.businessDirectorDetails);
+      }
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+      setLoading(false);
+    }
   }
 
   const platforms = [
@@ -126,11 +175,34 @@ export const BusinessDetails = () => {
 
   useEffect(() => {
     form.reset({
-      business_name: 'Jumia',
-      business_email: 'jumia@gmail.com',
-      phone_number: '+2348012345678',
+      business_logo: business?.logo ?? '',
+      cac_rc_number: business?.rc_number ?? '',
+      industry: business?.industry ?? '',
+      channel: business?.channel ?? '',
+      online_platforms: business?.online_channel ?? [],
+      website: business?.website_link?.replace(/^https?:\/\//, '') ?? '',
+      instagram: business?.instagram?.replace(/^@/, '') ?? '',
+      facebook: business?.facebook ?? '',
+      address: business?.address ?? '',
+      state: business?.state ?? '',
+      country: business?.country ?? '',
     });
-  }, [form]);
+  }, [
+    business?.address,
+    business?.channel,
+    business?.country,
+    business?.facebook,
+    business?.industry,
+    business?.instagram,
+    business?.logo,
+    business?.online_channel,
+    business?.rc_number,
+    business?.state,
+    business?.website_link,
+    form,
+  ]);
+
+  useFetchBusiness();
 
   return (
     <Form {...form}>
@@ -259,13 +331,11 @@ export const BusinessDetails = () => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="m@example.com">
-                        m@example.com
-                      </SelectItem>
-                      <SelectItem value="m@google.com">m@google.com</SelectItem>
-                      <SelectItem value="m@support.com">
-                        m@support.com
-                      </SelectItem>
+                      {INDUSTRIES.map((industry, index) => (
+                        <SelectItem key={index} value={industry.value}>
+                          {industry.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -294,13 +364,11 @@ export const BusinessDetails = () => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="m@example.com">
-                        m@example.com
-                      </SelectItem>
-                      <SelectItem value="m@google.com">m@google.com</SelectItem>
-                      <SelectItem value="m@support.com">
-                        m@support.com
-                      </SelectItem>
+                      {BUSINESS_CHANNELS.map((channel, index) => (
+                        <SelectItem key={index} value={channel.value}>
+                          {channel.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -317,6 +385,7 @@ export const BusinessDetails = () => {
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
+                          type="button"
                           variant="outline"
                           size={'lg'}
                           role="combobox"
@@ -416,7 +485,12 @@ export const BusinessDetails = () => {
                 <FormItem>
                   <FormLabel>Website Link</FormLabel>
                   <FormControl>
-                    <Input {...field} className="h-12" />
+                    <div className="relative flex items-center">
+                      <p className="absolute left-2.5 text-sm text-pashBlack-5">
+                        https://
+                      </p>
+                      <Input {...field} className="pl-14 h-12" />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -429,7 +503,12 @@ export const BusinessDetails = () => {
                 <FormItem>
                   <FormLabel>Instagram Handle</FormLabel>
                   <FormControl>
-                    <Input {...field} className="h-12" />
+                    <div className="relative flex items-center">
+                      <p className="absolute left-2.5 text-sm text-pashBlack-5">
+                        @
+                      </p>
+                      <Input {...field} className="pl-8 h-12" />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -474,11 +553,28 @@ export const BusinessDetails = () => {
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="country"
+              render={({field}) => (
+                <FormItem>
+                  <FormLabel>Country</FormLabel>
+                  <FormControl>
+                    <Input {...field} className="h-12" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Button type="submit" size={'lg'}>
-              Continue
+            <Button type="submit" size={'lg'} disabled={loading}>
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                'Continue'
+              )}
             </Button>
           </div>
         </div>

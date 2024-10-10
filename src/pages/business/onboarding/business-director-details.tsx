@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
@@ -14,9 +15,21 @@ import {Input} from '@/components/ui/input';
 import {PageHeader} from '@/components/layouts/account-setup-layout';
 import {useNavigate} from 'react-router-dom';
 import {ROUTES} from '@/router/routes';
+import {useBusiness} from '@/store/useBusiness';
+import {ApiResponseT, CountryCodeType, UpdateDirectorDetailsT} from '@/types';
+import {useEffect, useState} from 'react';
+import {Loader2} from 'lucide-react';
+import {CountryCode} from '@/components/ui/country-code';
+import businessServices from '@/services/business';
+import {toast} from 'react-toastify';
+import {useFetchDirectorsDetails} from '@/hooks/business';
 
 export const BusinessDirectorDetails = () => {
+  const {business, directorsDetails} = useBusiness();
   const navigate = useNavigate();
+  const [selectedCountryCode, setSelectedCountryCode] =
+    useState<CountryCodeType | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const formSchema = z.object({
     first_name: z.string().min(1, {
@@ -48,10 +61,49 @@ export const BusinessDirectorDetails = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    navigate(ROUTES.businessOnboardingSuccess);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!business) {
+      return;
+    }
+
+    const payload: UpdateDirectorDetailsT = {
+      first_name: values.first_name,
+      last_name: values.last_name,
+      phone_number: `${
+        selectedCountryCode?.callingCode
+      }${values.phone_number.slice(1)}`,
+      email: values.email,
+      address: values.address,
+    };
+
+    setLoading(true);
+    setLoading(true);
+    try {
+      const res: ApiResponseT = await businessServices.updateDirectorDetails(
+        payload,
+      );
+      if (res.status === 'success') {
+        setLoading(false);
+        toast.success(res.message);
+        navigate(ROUTES.verifyDirectorPhone);
+      }
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+      setLoading(false);
+    }
   }
+
+  useEffect(() => {
+    form.reset({
+      first_name: directorsDetails[0]?.first_name ?? '',
+      last_name: directorsDetails[0]?.last_name ?? '',
+      email: directorsDetails[0]?.email ?? '',
+      phone_number: directorsDetails[0]?.phone_number ?? '',
+      address: directorsDetails[0]?.address ?? '',
+    });
+  }, [directorsDetails, form]);
+
+  useFetchDirectorsDetails();
 
   return (
     <Form {...form}>
@@ -109,7 +161,19 @@ export const BusinessDirectorDetails = () => {
                 <FormItem>
                   <FormLabel>Phone Number</FormLabel>
                   <FormControl>
-                    <Input {...field} className="h-12" />
+                    <div className="relative flex items-center">
+                      <CountryCode
+                        selectedCountryCode={selectedCountryCode}
+                        setSelectedCountryCode={setSelectedCountryCode}
+                      />
+                      <Input
+                        type="tel"
+                        placeholder="Enter your phone number"
+                        className="pl-16 h-12"
+                        {...field}
+                        maxLength={11}
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -131,8 +195,12 @@ export const BusinessDirectorDetails = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Button type="submit" size={'lg'}>
-              Continue
+            <Button type="submit" size={'lg'} disabled={loading}>
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                'Continue'
+              )}
             </Button>
           </div>
         </div>

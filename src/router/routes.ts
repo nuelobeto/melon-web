@@ -9,7 +9,7 @@ export const ROUTES = {
   // business auth
   createBusinessAccount: '/auth/business/create-account',
   verifyBusinessAccount: '/auth/business/verify-email/:email',
-  businessAccountVerified: '/auth/business/account-verified',
+  businessAccountVerified: 'business/email-verified/:token',
   businessSignIn: '/auth/business/sign-in',
 
   // business onboarding
@@ -17,6 +17,7 @@ export const ROUTES = {
   businessPersonalDetails: '/onboarding/business/personal-details',
   businessDetails: '/onboarding/business/details',
   businessDirectorDetails: '/onboarding/business/director-details',
+  verifyDirectorPhone: '/onboarding/business/verify-phone/:phone',
   businessOnboardingSuccess: '/onboarding/business/success',
 
   // dashboard

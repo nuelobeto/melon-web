@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {AuthLayout, Main, SideBar} from '@/components/layouts/auth-layout';
-import {CheckCircle} from 'lucide-react';
+import {CheckCircle, Loader2} from 'lucide-react';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
@@ -15,11 +16,13 @@ import {
 } from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {CountryCode} from '@/components/ui/country-code';
-import {CountryCodeType} from '@/types';
+import {ApiResponseT, CountryCodeType, CreateBusinessT} from '@/types';
 import {useState} from 'react';
 import {Checkbox} from '@/components/ui/checkbox';
 import {Link, useNavigate} from 'react-router-dom';
 import {ROUTES} from '@/router/routes';
+import authServices from '@/services/auth';
+import {toast} from 'react-toastify';
 
 export const CreateBusinessAccount = () => {
   return (
@@ -77,10 +80,10 @@ const SideBarContent = () => {
 };
 
 const RegistrationForm = () => {
-  const [countryCodes, setCountryCodes] = useState<CountryCodeType[]>([]);
   const [selectedCountryCode, setSelectedCountryCode] =
     useState<CountryCodeType | null>(null);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const formSchema = z
     .object({
@@ -100,7 +103,9 @@ const RegistrationForm = () => {
       confirm_password: z.string().min(6, {
         message: 'Password must be at least 6 characters long',
       }),
-      agree_to_terms: z.boolean().default(false).optional(),
+      agree_to_terms: z.boolean().refine(val => val === true, {
+        message: 'You must agree to the terms.',
+      }),
     })
     .refine(data => data.password === data.confirm_password, {
       path: ['confirm_password'], // This indicates the field to show the error on
@@ -115,16 +120,38 @@ const RegistrationForm = () => {
       phone_number: '',
       password: '',
       confirm_password: '',
-      agree_to_terms: false,
+      agree_to_terms: true,
     },
     mode: 'onBlur',
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    navigate(
-      ROUTES.verifyBusinessAccount.replace(':email', values.business_email),
-    );
+  const emailValue = form.getValues('business_email');
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const payload: CreateBusinessT = {
+      name: values.business_name,
+      email: values.business_email,
+      phone_number: `${
+        selectedCountryCode?.callingCode
+      }${values.phone_number.slice(1)}`,
+      password: values.password,
+      add_terms_cond: values.agree_to_terms,
+    };
+
+    setLoading(true);
+    try {
+      const res: ApiResponseT = await authServices.createBusinessAccount(
+        payload,
+      );
+      if (res.status === 'success') {
+        setLoading(false);
+        toast.success(res.message);
+        navigate(ROUTES.verifyBusinessAccount.replace(':email', emailValue));
+      }
+    } catch (error: any) {
+      setLoading(false);
+      toast.error(error.response?.data?.message ?? 'Error creating business');
+    }
   }
 
   return (
@@ -190,8 +217,6 @@ const RegistrationForm = () => {
                 <FormControl>
                   <div className="relative flex items-center">
                     <CountryCode
-                      setCountryCodes={setCountryCodes}
-                      countryCodes={countryCodes}
                       selectedCountryCode={selectedCountryCode}
                       setSelectedCountryCode={setSelectedCountryCode}
                     />
@@ -250,23 +275,30 @@ const RegistrationForm = () => {
           control={form.control}
           name="agree_to_terms"
           render={({field}) => (
-            <FormItem className="flex flex-row items-center gap-4 space-y-0">
-              <FormControl>
-                <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-              <FormLabel className="font-normal">
-                I agree to Melon terms of use and privacy policy
-              </FormLabel>
+            <FormItem>
+              <div className="flex flex-row items-center gap-4">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <FormLabel className="font-normal">
+                  I agree to Melon terms of use and privacy policy
+                </FormLabel>
+              </div>
+              <FormMessage />
             </FormItem>
           )}
         />
 
         <div className="flex flex-col items-center gap-2">
-          <Button type="submit" className="h-12 w-full">
-            Create account
+          <Button type="submit" className="h-12 w-full" disabled={loading}>
+            {loading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              'Create account'
+            )}
           </Button>
           <p className="font-medium text-sm text-pashBlack-4 text-center">
             Have an account?{' '}

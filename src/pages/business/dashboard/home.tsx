@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {DashboardLayout} from '@/components/layouts/dashboard-layout';
 import {CartesianGrid, Line, LineChart, XAxis} from 'recharts';
 
@@ -21,8 +22,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {useState} from 'react';
-import {TransactionT} from '@/types';
+import {useEffect, useState} from 'react';
+import {ApiResponseT, TotalPatronageT, TransactionT} from '@/types';
 import {formatDateToCustomTimestamp} from '@/helpers';
 import {
   ColumnDef,
@@ -42,7 +43,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import {Button} from '@/components/ui/button';
-import {Badge} from '@/components/ui/badge';
 import {
   Sheet,
   SheetClose,
@@ -60,15 +60,21 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {Download, EllipsisVerticalIcon, Eye, X} from 'lucide-react';
 import {ScrollArea} from '@/components/ui/scroll-area';
+import {useFetchBusiness} from '@/hooks/business';
+import {toast} from 'react-toastify';
+import businessServices from '@/services/business';
+import {format} from 'date-fns';
 
 export const Home = () => {
+  useFetchBusiness();
+
   return (
     <DashboardLayout pageTitle="Dashboard">
       <OffersBanner />
 
       <div className="flex flex-col min-[1100px]:flex-row gap-4 mt-8 px-5">
         <TotalPatronage />
-        <Overview />
+        {/* <Overview /> */}
       </div>
 
       <RecentEngagements />
@@ -117,38 +123,42 @@ const OffersBanner = () => {
 };
 
 const TotalPatronage = () => {
-  const [timeRange, setTimeRange] = useState('90d');
+  const [chartData, setChartData] = useState<TotalPatronageT[]>([]);
+  const [timeRange, setTimeRange] = useState('month');
 
-  const chartData = [
-    {month: 'Sep', desktop: 130, date: '2024-09-15'},
-    {month: 'Sep', desktop: 100, date: '2024-09-28'},
-    {month: 'Sep', desktop: 186, date: '2024-09-29'},
-    {month: 'Sep', desktop: 305, date: '2024-09-30'},
-    {month: 'Oct', desktop: 237, date: '2024-10-01'},
-    {month: 'Oct', desktop: 73, date: '2024-10-02'},
-    {month: 'Oct', desktop: 209, date: '2024-10-03'},
-    {month: 'Oct', desktop: 214, date: '2024-10-04'},
-  ];
+  const formattedChartData = chartData.map((d: TotalPatronageT) => {
+    return {
+      ...d,
+      date: format(new Date(d.date), 'yyyy-MM-dd'),
+      month: format(new Date(d.date), 'MMM dd'),
+    };
+  });
+
+  const totalCumulativePoints = chartData.reduce((total, item) => {
+    return total + parseFloat(item.cumulative_points);
+  }, 0);
 
   const chartConfig = {
-    desktop: {
-      label: 'Desktop',
+    total_receipts: {
+      label: 'Total receipt',
       color: '#FA5EA1',
     },
   } satisfies ChartConfig;
 
-  const filteredData = chartData.filter(item => {
-    const date = new Date(item.date);
-    const now = new Date();
-    let daysToSubtract = 90;
-    if (timeRange === '30d') {
-      daysToSubtract = 30;
-    } else if (timeRange === '7d') {
-      daysToSubtract = 7;
+  const getTotalPatronage = async (filter: string) => {
+    try {
+      const res: ApiResponseT = await businessServices.getTotalPatronage(
+        filter,
+      );
+      setChartData(res.data);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message);
     }
-    now.setDate(now.getDate() - daysToSubtract);
-    return date >= now;
-  });
+  };
+
+  useEffect(() => {
+    getTotalPatronage(timeRange);
+  }, [timeRange]);
 
   return (
     <Card className="flex-[2] bg-mountainAsh-10 border-mountainAsh-7">
@@ -160,16 +170,16 @@ const TotalPatronage = () => {
           <CardDescription>
             Total number of users that have made purchases
           </CardDescription>
-          <p className="text-lg font-medium">19,000</p>
+          <p className="text-lg font-medium">{totalCumulativePoints}</p>
         </div>
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger className="w-[130px] rounded-lg">
             <SelectValue placeholder="Last 3 months" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="90d">Last 3 months</SelectItem>
-            <SelectItem value="30d">Last 30 days</SelectItem>
-            <SelectItem value="7d">Last 7 days</SelectItem>
+            <SelectItem value="3 month">Last 3 months</SelectItem>
+            <SelectItem value="month">Last 30 days</SelectItem>
+            <SelectItem value="week">Last 7 days</SelectItem>
           </SelectContent>
         </Select>
       </CardHeader>
@@ -178,7 +188,7 @@ const TotalPatronage = () => {
         <ChartContainer config={chartConfig} className="w-full max-h-[250px]">
           <LineChart
             accessibilityLayer
-            data={filteredData}
+            data={formattedChartData}
             margin={{
               left: 12,
               right: 12,
@@ -190,16 +200,16 @@ const TotalPatronage = () => {
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={value => value.slice(0, 3)}
+              tickFormatter={value => value.slice(0, 6)}
             />
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent hideLabel />}
             />
             <Line
-              dataKey="desktop"
+              dataKey="total_receipts"
               type="natural"
-              stroke="var(--color-desktop)"
+              stroke="var(--color-total_receipts)"
               strokeWidth={2}
               dot={false}
             />
@@ -210,121 +220,59 @@ const TotalPatronage = () => {
   );
 };
 
-const Overview = () => {
-  const [timeRange, setTimeRange] = useState('90d');
+// const Overview = () => {
+//   const [timeRange, setTimeRange] = useState('90d');
 
-  const data = [
-    {
-      label: 'Total customers',
-      value: '20,000',
-    },
-    {
-      label: 'New customers',
-      value: '20,000',
-    },
-    {
-      label: 'Returning customers',
-      value: '20,000',
-    },
-  ];
+//   const data = [
+//     {
+//       label: 'Total customers',
+//       value: '20,000',
+//     },
+//     {
+//       label: 'New customers',
+//       value: '20,000',
+//     },
+//     {
+//       label: 'Returning customers',
+//       value: '20,000',
+//     },
+//   ];
 
-  return (
-    <Card className="flex-1 border-mountainAsh-7">
-      <CardHeader className="flex items-center gap-2 space-y-0 p-4 flex-row">
-        <div className="grid flex-1 gap-1 text-left">
-          <CardTitle className="text-lg text-pashBlack-1">Overview</CardTitle>
-        </div>
-        <Select value={timeRange} onValueChange={setTimeRange}>
-          <SelectTrigger className="w-[130px] rounded-lg">
-            <SelectValue placeholder="Last 3 months" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="90d">Last 3 months</SelectItem>
-            <SelectItem value="30d">Last 30 days</SelectItem>
-            <SelectItem value="7d">Last 7 days</SelectItem>
-          </SelectContent>
-        </Select>
-      </CardHeader>
+//   return (
+//     <Card className="flex-1 border-mountainAsh-7">
+//       <CardHeader className="flex items-center gap-2 space-y-0 p-4 flex-row">
+//         <div className="grid flex-1 gap-1 text-left">
+//           <CardTitle className="text-lg text-pashBlack-1">Overview</CardTitle>
+//         </div>
+//         <Select value={timeRange} onValueChange={setTimeRange}>
+//           <SelectTrigger className="w-[130px] rounded-lg">
+//             <SelectValue placeholder="Last 3 months" />
+//           </SelectTrigger>
+//           <SelectContent>
+//             <SelectItem value="90d">Last 3 months</SelectItem>
+//             <SelectItem value="30d">Last 30 days</SelectItem>
+//             <SelectItem value="7d">Last 7 days</SelectItem>
+//           </SelectContent>
+//         </Select>
+//       </CardHeader>
 
-      <CardContent className="p-4">
-        {data.map((customer, index) => (
-          <div
-            key={index}
-            className="py-4 border-b border-mountainAsh-7 flex items-center justify-between"
-          >
-            <p className="text-pashBlack-1 text-sm">{customer.label}</p>
-            <p className="text-pashBlack-1 text-sm">{customer.value}</p>
-          </div>
-        ))}
-      </CardContent>
-    </Card>
-  );
-};
-
-const data: TransactionT[] = [
-  {
-    id: '1',
-    transaction_id: 'TX-1234',
-    name: 'Hal Jordan',
-    amount: '100000',
-    date: formatDateToCustomTimestamp(new Date()),
-    status: 'received',
-    items: [
-      {
-        item: 'Spaghetti',
-        quantity: '10',
-        amount: '10,000',
-      },
-      {
-        item: 'Bread',
-        quantity: '2',
-        amount: '3,200',
-      },
-    ],
-  },
-  {
-    id: '2',
-    transaction_id: 'TX-5678',
-    name: 'Diana Prince',
-    amount: '200000',
-    date: formatDateToCustomTimestamp(new Date()),
-    status: 'pending',
-    items: [
-      {
-        item: 'Spaghetti',
-        quantity: '10',
-        amount: '10,000',
-      },
-      {
-        item: 'Bread',
-        quantity: '2',
-        amount: '3,200',
-      },
-    ],
-  },
-  {
-    id: '3',
-    transaction_id: 'TX-9012',
-    name: 'Barry Allen',
-    amount: '150000',
-    date: formatDateToCustomTimestamp(new Date()),
-    status: 'failed',
-    items: [
-      {
-        item: 'Spaghetti',
-        quantity: '10',
-        amount: '10,000',
-      },
-      {
-        item: 'Bread',
-        quantity: '2',
-        amount: '3,200',
-      },
-    ],
-  },
-];
+//       <CardContent className="p-4">
+//         {data.map((customer, index) => (
+//           <div
+//             key={index}
+//             className="py-4 border-b border-mountainAsh-7 flex items-center justify-between"
+//           >
+//             <p className="text-pashBlack-1 text-sm">{customer.label}</p>
+//             <p className="text-pashBlack-1 text-sm">{customer.value}</p>
+//           </div>
+//         ))}
+//       </CardContent>
+//     </Card>
+//   );
+// };
 
 const RecentEngagements = () => {
+  const [data, setData] = useState<TransactionT[]>([]);
   const [openDetails, setOpenDetails] = useState(false);
   const [selectedTransaction, setSelectedTransaction] =
     useState<TransactionT | null>(null);
@@ -341,12 +289,8 @@ const RecentEngagements = () => {
 
   const columns: ColumnDef<TransactionT>[] = [
     {
-      accessorKey: 'transaction_id',
+      accessorKey: 'receipt_id',
       header: 'Transaction ID',
-    },
-    {
-      accessorKey: 'name',
-      header: 'Name',
     },
     {
       accessorKey: 'amount',
@@ -358,15 +302,13 @@ const RecentEngagements = () => {
     {
       accessorKey: 'date',
       header: 'Date',
+      cell: ({row}) => (
+        <p>{formatDateToCustomTimestamp(row.getValue('date'))}</p>
+      ),
     },
     {
-      accessorKey: 'status',
-      header: 'Status',
-      cell: ({row}) => (
-        <Badge variant={row.getValue('status')} className="capitalize">
-          {row.getValue('status')}
-        </Badge>
-      ),
+      accessorKey: 'point_type',
+      header: 'Transaction Type',
     },
     {
       id: 'actions',
@@ -409,6 +351,19 @@ const RecentEngagements = () => {
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
   });
+
+  const getRecentEngagement = async () => {
+    try {
+      const res: ApiResponseT = await businessServices.getRecentEngagement();
+      setData(res.data);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message);
+    }
+  };
+
+  useEffect(() => {
+    getRecentEngagement();
+  }, []);
 
   return (
     <>
@@ -476,7 +431,14 @@ const RecentEngagements = () => {
                       colSpan={columns.length}
                       className="h-24 text-center"
                     >
-                      No results.
+                      <img
+                        src="/images/empty-folder.png"
+                        alt=""
+                        width={100}
+                        height={100}
+                        className="block mx-auto"
+                      />
+                      <p>No Data</p>
                     </TableCell>
                   </TableRow>
                 )}
@@ -526,19 +488,13 @@ const TransactionDetails = ({
             <div className="p-5">
               <div className="flex flex-col gap-2">
                 <h2 className="text-pashBlack-1 text-base">
-                  Transaction ID: {transaction?.transaction_id}
+                  Transaction ID: {transaction?.receipt_id}
                 </h2>
                 <p className="text-pashBlack-1 text-sm">
-                  Customer Name: {transaction?.name}
+                  Date: {transaction?.created_at}
                 </p>
                 <p className="text-pashBlack-1 text-sm">
-                  Date: {transaction?.date}
-                </p>
-                <p className="text-pashBlack-1 text-sm">
-                  Transaction Status:{' '}
-                  <Badge variant={transaction?.status} className=" capitalize">
-                    {transaction?.status}
-                  </Badge>
+                  Transaction Type: transaction?.point_type
                 </p>
               </div>
 

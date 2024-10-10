@@ -21,6 +21,8 @@ import {BusinessSettings} from '@/pages/business/dashboard/settings/business';
 import {Guides} from '@/pages/business/dashboard/settings/guides/guides';
 import {WebGuide} from '@/pages/business/dashboard/settings/guides/web-guide';
 import {MobileGuide} from '@/pages/business/dashboard/settings/guides/mobile-guide';
+import {VerifyDirectorPhone} from '@/pages/business/onboarding/verify-director-phone';
+import ProtectedRoutes from '@/components/layouts/ProtectedRoutes';
 
 const AppRouter = () => {
   return (
@@ -75,35 +77,41 @@ const AppRouter = () => {
         />
       </Route>
       <Route
+        path={ROUTES.verifyDirectorPhone}
+        element={<VerifyDirectorPhone />}
+      />
+      <Route
         path={ROUTES.businessOnboardingSuccess}
         element={<BusinessOnboardingSuccess />}
       />
 
-      {/* Dashboard */}
-      <Route path={ROUTES.home} element={<Home />} />
-      <Route path={ROUTES.settings} element={<Settings />}>
-        <Route
-          path=""
-          element={<Navigate to={ROUTES.profileSettngs} replace={true} />}
-        />
-        <Route path={ROUTES.profileSettngs} element={<ProfileSettings />} />
-        <Route path={ROUTES.businessSettngs} element={<BusinessSettings />} />
-        <Route path={ROUTES.guides} element={<Guides />}>
+      <Route element={<ProtectedRoutes />}>
+        {/* Dashboard */}
+        <Route path={ROUTES.home} element={<Home />} />
+        <Route path={ROUTES.settings} element={<Settings />}>
           <Route
             path=""
-            element={
-              <Navigate to={ROUTES.webWidgetIntegration} replace={true} />
-            }
+            element={<Navigate to={ROUTES.profileSettngs} replace={true} />}
           />
-          <Route path={ROUTES.webWidgetIntegration} element={<WebGuide />} />
-          <Route
-            path={ROUTES.mobileWidgetIntegration}
-            element={<MobileGuide />}
-          />
+          <Route path={ROUTES.profileSettngs} element={<ProfileSettings />} />
+          <Route path={ROUTES.businessSettngs} element={<BusinessSettings />} />
+          <Route path={ROUTES.guides} element={<Guides />}>
+            <Route
+              path=""
+              element={
+                <Navigate to={ROUTES.webWidgetIntegration} replace={true} />
+              }
+            />
+            <Route path={ROUTES.webWidgetIntegration} element={<WebGuide />} />
+            <Route
+              path={ROUTES.mobileWidgetIntegration}
+              element={<MobileGuide />}
+            />
+          </Route>
         </Route>
-      </Route>
 
-      <Route path={'/widget'} element={<WidgetTest />} />
+        <Route path={'/widget'} element={<WidgetTest />} />
+      </Route>
     </Routes>
   );
 };
