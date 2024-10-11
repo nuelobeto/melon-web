@@ -21,9 +21,13 @@ import {ROUTES} from '@/router/routes';
 import {CountryCode} from '@/components/ui/country-code';
 import businessServices from '@/services/business';
 import {useAuth} from '@/store/useAuth';
-import {toast} from 'react-toastify';
 import {useFetchPersonalDetails} from '@/hooks/business';
 import {Loader2} from 'lucide-react';
+import {
+  emailSchema,
+  phoneNumberSchema,
+  stringSchema,
+} from '@/helpers/zod-schema';
 
 export const BusinessPersonalDetails = () => {
   const {user} = useAuth();
@@ -34,19 +38,10 @@ export const BusinessPersonalDetails = () => {
   const [loading, setLoading] = useState(false);
 
   const formSchema = z.object({
-    first_name: z.string().min(1, {
-      message: 'Please enter your first name',
-    }),
-    last_name: z.string().min(1, {
-      message: 'Please enter your last name',
-    }),
-    email: z
-      .string()
-      .min(1, {message: 'Please enter your email.'})
-      .email({message: 'Please enter a valid email address.'}),
-    phone_number: z.string().min(1, {
-      message: 'Please enter your phone number.',
-    }),
+    first_name: stringSchema('Please enter your first name.'),
+    last_name: stringSchema('Please enter your last name.'),
+    email: emailSchema('Please enter your email address.'),
+    phone_number: phoneNumberSchema('Please enter your phone number.'),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -67,7 +62,7 @@ export const BusinessPersonalDetails = () => {
     const payload: UpdatePersonalDetailsT = {
       first_name: values.first_name,
       last_name: values.last_name,
-      phone_number: `${
+      phone_number: `+${
         selectedCountryCode?.callingCode
       }${values.phone_number.slice(1)}`,
       email: values.email,
@@ -81,11 +76,9 @@ export const BusinessPersonalDetails = () => {
       );
       if (res.status === 'success') {
         setLoading(false);
-        toast.success(res.message);
         navigate(ROUTES.businessDetails);
       }
     } catch (error: any) {
-      toast.error(error.response.data.message);
       setLoading(false);
     }
   }
@@ -95,7 +88,7 @@ export const BusinessPersonalDetails = () => {
       email: personalDetails?.email ?? '',
       first_name: personalDetails?.first_name ?? '',
       last_name: personalDetails?.last_name ?? '',
-      phone_number: personalDetails?.phone_number ?? '',
+      phone_number: personalDetails?.phone_number.replace(/^\+234/, '0') ?? '',
     });
   }, [
     personalDetails?.email,

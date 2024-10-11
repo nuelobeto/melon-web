@@ -75,15 +75,9 @@ export const BusinessDetails = () => {
     online_platforms: z.array(z.string()).min(1, {
       message: 'Please select at least one platform',
     }),
-    website: z.string().min(1, {
-      message: 'Please enter your business website',
-    }),
-    instagram: z.string().min(1, {
-      message: 'Please enter your instagram',
-    }),
-    facebook: z.string().min(1, {
-      message: 'Please enter your facebook',
-    }),
+    website: z.string().optional(),
+    instagram: z.string().optional(),
+    facebook: z.string().optional(),
     address: z.string().min(1, {
       message: 'Please enter your business address',
     }),
@@ -126,11 +120,11 @@ export const BusinessDetails = () => {
       channel: values.channel,
       address: values.address,
       country: values.country,
-      facebook: values.facebook,
+      facebook: values.facebook ?? null,
       industry: values.industry,
-      instagram: `@${values.instagram}`,
+      instagram: values.instagram !== '' ? `@${values.instagram}` : null,
       rc_number: values.cac_rc_number,
-      website_link: `https://${values.website}`,
+      website_link: values.website !== '' ? `https://${values.website}` : null,
       phone_number: values.phone_number,
       name: values.business_name,
       online_channel: values.online_platforms,
@@ -203,6 +197,8 @@ export const BusinessDetails = () => {
   ]);
 
   useFetchBusiness();
+
+  const platformsValue = form.watch('online_platforms');
 
   return (
     <Form {...form}>
@@ -478,55 +474,61 @@ export const BusinessDetails = () => {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="website"
-              render={({field}) => (
-                <FormItem>
-                  <FormLabel>Website Link</FormLabel>
-                  <FormControl>
-                    <div className="relative flex items-center">
-                      <p className="absolute left-2.5 text-sm text-pashBlack-5">
-                        https://
-                      </p>
-                      <Input {...field} className="pl-14 h-12" />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="instagram"
-              render={({field}) => (
-                <FormItem>
-                  <FormLabel>Instagram Handle</FormLabel>
-                  <FormControl>
-                    <div className="relative flex items-center">
-                      <p className="absolute left-2.5 text-sm text-pashBlack-5">
-                        @
-                      </p>
-                      <Input {...field} className="pl-8 h-12" />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="facebook"
-              render={({field}) => (
-                <FormItem>
-                  <FormLabel>Facebook</FormLabel>
-                  <FormControl>
-                    <Input {...field} className="h-12" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {platformsValue.includes('website') && (
+              <FormField
+                control={form.control}
+                name="website"
+                render={({field}) => (
+                  <FormItem>
+                    <FormLabel>Website Link</FormLabel>
+                    <FormControl>
+                      <div className="relative flex items-center">
+                        <p className="absolute left-2.5 text-sm text-pashBlack-5">
+                          https://
+                        </p>
+                        <Input {...field} className="pl-14 h-12" />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            {platformsValue.includes('instagram') && (
+              <FormField
+                control={form.control}
+                name="instagram"
+                render={({field}) => (
+                  <FormItem>
+                    <FormLabel>Instagram Handle</FormLabel>
+                    <FormControl>
+                      <div className="relative flex items-center">
+                        <p className="absolute left-2.5 text-sm text-pashBlack-5">
+                          @
+                        </p>
+                        <Input {...field} className="pl-8 h-12" />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            {platformsValue.includes('facebook') && (
+              <FormField
+                control={form.control}
+                name="facebook"
+                render={({field}) => (
+                  <FormItem>
+                    <FormLabel>Facebook</FormLabel>
+                    <FormControl>
+                      <Input {...field} className="h-12" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             <FormField
               control={form.control}
               name="address"

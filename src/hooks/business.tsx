@@ -4,7 +4,6 @@ import {useAuth} from '@/store/useAuth';
 import {useBusiness} from '@/store/useBusiness';
 import {ApiResponseT} from '@/types';
 import {useCallback, useEffect} from 'react';
-import {toast} from 'react-toastify';
 
 export const useFetchBusiness = () => {
   const {user} = useAuth();
@@ -20,7 +19,7 @@ export const useFetchBusiness = () => {
           setBusiness(res.data);
         }
       } catch (error: any) {
-        toast.error(error.response?.data?.message ?? 'Error fetching business');
+        console.log(error);
       }
     },
     [setBusiness],
@@ -47,9 +46,7 @@ export const useFetchPersonalDetails = () => {
           setPersonalDetails(res.data);
         }
       } catch (error: any) {
-        toast.error(
-          error.response?.data?.message ?? 'Error fetching personal details',
-        );
+        console.log(error);
       }
     },
     [setPersonalDetails],
@@ -76,9 +73,7 @@ export const useFetchDirectorsDetails = () => {
           setDirectorDetails(res.data);
         }
       } catch (error: any) {
-        toast.error(
-          error.response?.data?.message ?? 'Error fetching director details',
-        );
+        console.log(error);
       }
     },
     [setDirectorDetails],

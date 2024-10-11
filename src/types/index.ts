@@ -92,11 +92,11 @@ export type UpdateBusinessDetailsT = {
   channel: string;
   address: string;
   country: string;
-  facebook: string;
+  facebook: string | null;
   industry: string;
-  instagram: string;
+  instagram: string | null;
   rc_number: string;
-  website_link: string;
+  website_link: string | null;
   phone_number: string;
   name: string;
   online_channel: string[];

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {AuthLayout, Main, SideBar} from '@/components/layouts/auth-layout';
-import {CheckCircle, Loader2} from 'lucide-react';
+import {Loader2} from 'lucide-react';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
@@ -23,59 +23,26 @@ import {Link, useNavigate} from 'react-router-dom';
 import {ROUTES} from '@/router/routes';
 import authServices from '@/services/auth';
 import {toast} from 'react-toastify';
+import {
+  emailSchema,
+  passwordSchema,
+  phoneNumberSchema,
+  stringSchema,
+} from '@/helpers/zod-schema';
+import {ScrollArea} from '@/components/ui/scroll-area';
 
 export const CreateBusinessAccount = () => {
   return (
     <AuthLayout>
-      <SideBar>
-        <SideBarContent />
-      </SideBar>
+      <SideBar />
       <Main>
-        <RegistrationForm />
+        <ScrollArea className="w-full h-full">
+          <div className="w-full h-full max-w-[500px] pt-32 px-5 pb-20 mx-auto">
+            <RegistrationForm />
+          </div>
+        </ScrollArea>
       </Main>
     </AuthLayout>
-  );
-};
-
-const SideBarContent = () => {
-  const welcomeTexts = [
-    {
-      title: 'Improve sales and revenue growth',
-      description:
-        'Unlock revenue growth potential with rewards and campaigns and encourage customers to increase spending and drive measurable revenue growth for your business',
-    },
-    {
-      title: 'Increase customer engagement',
-      description:
-        'Create targeted rewards, campaigns, motivating customers to make more purchases and engage with your brand regularly which in turn would improve overall business revenue',
-    },
-    {
-      title: 'Faster payment transactions and confirmations',
-      description:
-        'Improve smoother checkout experience, reducing cart abandonment rates and boosting customer satisfaction.',
-    },
-  ];
-
-  return (
-    <div className="flex flex-col gap-16">
-      <h2 className="font-medium text-3xl bg-gradient-to-r from-[#FF4DAE] via-[#E2A26A] to-[#C3FF1E] text-transparent bg-clip-text">
-        Launch and Manage Loyalty <br /> and campaigns seamlessly
-      </h2>
-
-      <div className="flex flex-col gap-14">
-        {welcomeTexts.map((text, index) => (
-          <div key={index} className="flex items-start gap-3">
-            <CheckCircle className="text-pashBlack-10 mt-[6px]" />
-            <div className="w-full max-w-[489px] flex flex-col gap-2">
-              <h3 className="font-medium text-2xl text-pashBlack-10">
-                {text.title}
-              </h3>
-              <p className="text-base text-pashBlack-8">{text.description}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
   );
 };
 
@@ -87,22 +54,13 @@ const RegistrationForm = () => {
 
   const formSchema = z
     .object({
-      business_name: z.string().min(1, {
-        message: 'Please enter your business name.',
-      }),
-      business_email: z
-        .string()
-        .min(1, {message: 'Please enter your business email.'})
-        .email({message: 'Please enter a valid email address.'}),
-      phone_number: z.string().min(1, {
-        message: 'Please enter your phone number.',
-      }),
-      password: z.string().min(6, {
-        message: 'Password must be at least 6 characters long',
-      }),
-      confirm_password: z.string().min(6, {
-        message: 'Password must be at least 6 characters long',
-      }),
+      business_name: stringSchema('Please enter your business name.'),
+      business_email: emailSchema('Please enter your business email.'),
+      phone_number: phoneNumberSchema(
+        'Please enter your business phone number.',
+      ),
+      password: passwordSchema('Enter your password.'),
+      confirm_password: passwordSchema('Confirm your password.'),
       agree_to_terms: z.boolean().refine(val => val === true, {
         message: 'You must agree to the terms.',
       }),
@@ -131,7 +89,7 @@ const RegistrationForm = () => {
     const payload: CreateBusinessT = {
       name: values.business_name,
       email: values.business_email,
-      phone_number: `${
+      phone_number: `+${
         selectedCountryCode?.callingCode
       }${values.phone_number.slice(1)}`,
       password: values.password,
@@ -145,7 +103,6 @@ const RegistrationForm = () => {
       );
       if (res.status === 'success') {
         setLoading(false);
-        toast.success(res.message);
         navigate(ROUTES.verifyBusinessAccount.replace(':email', emailValue));
       }
     } catch (error: any) {

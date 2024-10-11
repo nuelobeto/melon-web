@@ -21,8 +21,8 @@ import {useEffect, useState} from 'react';
 import {Loader2} from 'lucide-react';
 import {CountryCode} from '@/components/ui/country-code';
 import businessServices from '@/services/business';
-import {toast} from 'react-toastify';
 import {useFetchDirectorsDetails} from '@/hooks/business';
+import {emailSchema, phoneNumberSchema} from '@/helpers/zod-schema';
 
 export const BusinessDirectorDetails = () => {
   const {business, directorsDetails} = useBusiness();
@@ -38,13 +38,8 @@ export const BusinessDirectorDetails = () => {
     last_name: z.string().min(1, {
       message: 'Please enter your last name',
     }),
-    email: z
-      .string()
-      .min(1, {message: 'Please enter your business email.'})
-      .email({message: 'Please enter a valid email address.'}),
-    phone_number: z.string().min(1, {
-      message: 'Please enter your phone number.',
-    }),
+    email: emailSchema('Please enter your email.'),
+    phone_number: phoneNumberSchema('Please enter your phone number'),
     address: z.string().min(1, {
       message: 'Please enter your address',
     }),
@@ -69,7 +64,7 @@ export const BusinessDirectorDetails = () => {
     const payload: UpdateDirectorDetailsT = {
       first_name: values.first_name,
       last_name: values.last_name,
-      phone_number: `${
+      phone_number: `+${
         selectedCountryCode?.callingCode
       }${values.phone_number.slice(1)}`,
       email: values.email,
@@ -84,11 +79,15 @@ export const BusinessDirectorDetails = () => {
       );
       if (res.status === 'success') {
         setLoading(false);
-        toast.success(res.message);
-        navigate(ROUTES.verifyDirectorPhone);
+        localStorage.setItem(
+          'director-phone',
+          JSON.stringify(payload.phone_number),
+        );
+        navigate(
+          ROUTES.verifyDirectorPhone.replace(':phone', payload.phone_number),
+        );
       }
     } catch (error: any) {
-      toast.error(error.response.data.message);
       setLoading(false);
     }
   }
@@ -98,7 +97,8 @@ export const BusinessDirectorDetails = () => {
       first_name: directorsDetails[0]?.first_name ?? '',
       last_name: directorsDetails[0]?.last_name ?? '',
       email: directorsDetails[0]?.email ?? '',
-      phone_number: directorsDetails[0]?.phone_number ?? '',
+      phone_number:
+        directorsDetails[0]?.phone_number.replace(/^\+234/, '0') ?? '',
       address: directorsDetails[0]?.address ?? '',
     });
   }, [directorsDetails, form]);

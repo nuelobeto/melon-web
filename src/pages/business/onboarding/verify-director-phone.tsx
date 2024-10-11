@@ -13,7 +13,6 @@ import {
 import {InputOTP, InputOTPGroup, InputOTPSlot} from '@/components/ui/input-otp';
 import {useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
-import {toast} from 'react-toastify';
 import {ROUTES} from '@/router/routes';
 import {Loader2} from 'lucide-react';
 import {ApiResponseT} from '@/types';
@@ -50,11 +49,9 @@ export const VerifyDirectorPhone = () => {
       const res: ApiResponseT = await businessServices.verifyDirectorPhone(otp);
       if (res.status === 'success') {
         setLoading(false);
-        toast.success(res.message);
         navigate(ROUTES.businessOnboardingSuccess);
       }
     } catch (error: any) {
-      toast.error(error.response.data.message);
       setLoading(false);
     }
   };
@@ -66,10 +63,8 @@ export const VerifyDirectorPhone = () => {
         const res: ApiResponseT = await businessServices.resendOtp(phone);
         if (res.status === 'success') {
           setResendingOtp(false);
-          toast.success(res.message);
         }
       } catch (error: any) {
-        toast.error(error.response.data.message);
         setResendingOtp(false);
       }
     }

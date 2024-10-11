@@ -23,6 +23,7 @@ import {WebGuide} from '@/pages/business/dashboard/settings/guides/web-guide';
 import {MobileGuide} from '@/pages/business/dashboard/settings/guides/mobile-guide';
 import {VerifyDirectorPhone} from '@/pages/business/onboarding/verify-director-phone';
 import ProtectedRoutes from '@/components/layouts/ProtectedRoutes';
+import {NotFound} from '@/pages/404';
 
 const AppRouter = () => {
   return (
@@ -112,6 +113,8 @@ const AppRouter = () => {
 
         <Route path={'/widget'} element={<WidgetTest />} />
       </Route>
+
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 };

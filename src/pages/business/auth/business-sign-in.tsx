@@ -20,23 +20,20 @@ import {Loader2} from 'lucide-react';
 import {ApiResponseT, LoginT} from '@/types';
 import {useEffect, useState} from 'react';
 import authServices from '@/services/auth';
-import {toast} from 'react-toastify';
 import {useAuth} from '@/store/useAuth';
 import {useFetchBusiness} from '@/hooks/business';
 import {useBusiness} from '@/store/useBusiness';
+import {emailSchema, passwordSchema} from '@/helpers/zod-schema';
 
 export const BusinessSignIn = () => {
   return (
     <AuthLayout>
-      <SideBar>
-        <div className="flex flex-col gap-16">
-          <h2 className="font-medium text-3xl bg-gradient-to-r from-[#FF4DAE] via-[#E2A26A] to-[#C3FF1E] text-transparent bg-clip-text">
-            Modern loyalty and campaign management platform for your business
-          </h2>
-        </div>
-      </SideBar>
+      <SideBar />
+
       <Main>
-        <RegistrationForm />
+        <div className="w-full h-full mx-auto max-w-[500px] px-5 flex flex-col items-center justify-center gap-6">
+          <RegistrationForm />
+        </div>
       </Main>
     </AuthLayout>
   );
@@ -51,13 +48,8 @@ const RegistrationForm = () => {
   const [success, setSuccess] = useState(false);
 
   const formSchema = z.object({
-    business_email: z
-      .string()
-      .min(1, {message: 'Please enter your business email.'})
-      .email({message: 'Please enter a valid email address.'}),
-    password: z.string().min(6, {
-      message: 'Password must be at least 6 characters long',
-    }),
+    business_email: emailSchema('Please enter your business email.'),
+    password: passwordSchema(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -83,11 +75,9 @@ const RegistrationForm = () => {
         setLoading(false);
         setSuccess(true);
         setUser(res.data.member);
-        toast.success(res.message);
       }
     } catch (error: any) {
       setLoading(false);
-      toast.error(error.response?.data?.message ?? 'Error logging in');
     }
   }
 
@@ -120,7 +110,7 @@ const RegistrationForm = () => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-6"
+        className="w-full flex flex-col gap-6"
       >
         <div className="flex flex-col gap-2">
           <h1 className="font-semibold text-4xl text-pashBlack-1 text-center">
