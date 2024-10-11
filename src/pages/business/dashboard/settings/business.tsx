@@ -205,7 +205,9 @@ export const BusinessSettings = () => {
           <div className="w-[150px] h-[150px] rounded-full border border-mountainAsh-1 border-dashed p-1">
             <Avatar className="w-full h-full">
               <AvatarImage src={business?.logo ?? undefined} />
-              <AvatarFallback className="text-4xl">CN</AvatarFallback>
+              <AvatarFallback className="text-4xl">
+                {business?.name.charAt(0)}
+              </AvatarFallback>
             </Avatar>
           </div>
           <div className="flex items-center gap-3">
