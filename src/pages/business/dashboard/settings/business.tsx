@@ -406,8 +406,6 @@ const EditBusinessInfo = () => {
     form,
   ]);
 
-  useFetchBusiness();
-
   useEffect(() => {
     form.reset({
       business_logo: business?.logo ?? '',
@@ -444,6 +442,8 @@ const EditBusinessInfo = () => {
   ]);
 
   useFetchBusiness();
+
+  const platformsValue = form.watch('online_platforms');
 
   return (
     <Sheet modal={false} open={open} onOpenChange={setOpen}>
@@ -700,45 +700,61 @@ const EditBusinessInfo = () => {
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={form.control}
-                    name="website"
-                    render={({field}) => (
-                      <FormItem>
-                        <FormLabel>Website Link</FormLabel>
-                        <FormControl>
-                          <Input {...field} className="h-12" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="instagram"
-                    render={({field}) => (
-                      <FormItem>
-                        <FormLabel>Instagram Handle</FormLabel>
-                        <FormControl>
-                          <Input {...field} className="h-12" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="facebook"
-                    render={({field}) => (
-                      <FormItem>
-                        <FormLabel>Facebook</FormLabel>
-                        <FormControl>
-                          <Input {...field} className="h-12" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {platformsValue.includes('website') && (
+                    <FormField
+                      control={form.control}
+                      name="website"
+                      render={({field}) => (
+                        <FormItem>
+                          <FormLabel>Website Link</FormLabel>
+                          <FormControl>
+                            <div className="relative flex items-center">
+                              <p className="absolute left-2.5 text-sm text-pashBlack-5">
+                                https://
+                              </p>
+                              <Input {...field} className="pl-14 h-12" />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                  {platformsValue.includes('instagram') && (
+                    <FormField
+                      control={form.control}
+                      name="instagram"
+                      render={({field}) => (
+                        <FormItem>
+                          <FormLabel>Instagram Handle</FormLabel>
+                          <FormControl>
+                            <div className="relative flex items-center">
+                              <p className="absolute left-2.5 text-sm text-pashBlack-5">
+                                @
+                              </p>
+                              <Input {...field} className="pl-8 h-12" />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                  {platformsValue.includes('facebook') && (
+                    <FormField
+                      control={form.control}
+                      name="facebook"
+                      render={({field}) => (
+                        <FormItem>
+                          <FormLabel>Facebook</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="h-12" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
                   <FormField
                     control={form.control}
                     name="address"
