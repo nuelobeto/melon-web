@@ -10,6 +10,7 @@ type Props = {
 export type Detail = {
   label: string;
   value: string | null;
+  capitilize?: boolean;
 };
 
 export const ProfileDetails = ({title, details, edit}: Props) => {
@@ -48,7 +49,12 @@ export const ProfileDetails = ({title, details, edit}: Props) => {
               <td className="w-[250px] text-sm font-medium text-pashBlack-1">
                 {detail.label}
               </td>
-              <td className="text-sm text-pashBlack-6 capitalize">
+              <td
+                className={cn(
+                  'text-sm text-pashBlack-6',
+                  detail.capitilize && 'capitalize',
+                )}
+              >
                 {value(detail)}
               </td>
             </tr>

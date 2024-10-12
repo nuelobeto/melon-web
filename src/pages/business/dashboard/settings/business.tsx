@@ -83,10 +83,12 @@ export const BusinessSettings = () => {
     {
       label: 'cac_rc_number',
       value: business?.rc_number ?? null,
+      capitilize: true,
     },
     {
       label: 'Business Name',
       value: business?.name ?? null,
+      capitilize: true,
     },
     {
       label: 'Business Email',
@@ -99,16 +101,19 @@ export const BusinessSettings = () => {
     {
       label: 'Industry',
       value: business?.industry ?? null,
+      capitilize: true,
     },
     {
       label: 'Channel',
       value: business?.channel ?? null,
+      capitilize: true,
     },
     {
       label: 'Online Platforms',
       value: business?.online_channel?.length
         ? business.online_channel.join(', ')
         : null,
+      capitilize: true,
     },
     {
       label: 'Website',
@@ -125,14 +130,17 @@ export const BusinessSettings = () => {
     {
       label: 'Address',
       value: business?.address ?? null,
+      capitilize: true,
     },
     {
       label: 'State',
       value: business?.state ?? null,
+      capitilize: true,
     },
     {
       label: 'Country',
       value: business?.country ?? null,
+      capitilize: true,
     },
   ];
 
@@ -140,10 +148,12 @@ export const BusinessSettings = () => {
     {
       label: 'First Name',
       value: directorsDetails.length > 0 ? directorsDetails[0].first_name : '',
+      capitilize: true,
     },
     {
       label: 'Last Name',
       value: directorsDetails.length > 0 ? directorsDetails[0].last_name : '',
+      capitilize: true,
     },
     {
       label: 'Phone Number',
@@ -157,6 +167,7 @@ export const BusinessSettings = () => {
     {
       label: 'Address',
       value: directorsDetails.length > 0 ? directorsDetails[0].address : '',
+      capitilize: true,
     },
   ];
 
@@ -857,7 +868,7 @@ const EditDirectorInfo = () => {
     const payload: UpdateDirectorDetailsT = {
       first_name: values.first_name,
       last_name: values.last_name,
-      phone_number: `${
+      phone_number: `+${
         selectedCountryCode?.callingCode
       }${values.phone_number.slice(1)}`,
       email: values.email,
@@ -902,7 +913,8 @@ const EditDirectorInfo = () => {
       first_name: directorsDetails[0]?.first_name ?? '',
       last_name: directorsDetails[0]?.last_name ?? '',
       email: directorsDetails[0]?.email ?? '',
-      phone_number: directorsDetails[0]?.phone_number.replace(/^234/, '') ?? '',
+      phone_number:
+        directorsDetails[0]?.phone_number.replace(/^\+234/, '0') ?? '',
       address: directorsDetails[0]?.address ?? '',
     });
   }, [directorsDetails, form]);

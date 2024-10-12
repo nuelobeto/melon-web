@@ -135,7 +135,7 @@ const EditPersonalInfo = () => {
     const payload: UpdatePersonalDetailsT = {
       first_name: values.first_name,
       last_name: values.last_name,
-      phone_number: `${
+      phone_number: `+${
         selectedCountryCode?.callingCode
       }${values.phone_number.slice(1)}`,
       email: values.email,
@@ -179,7 +179,7 @@ const EditPersonalInfo = () => {
       email: personalDetails?.email ?? '',
       first_name: personalDetails?.first_name ?? '',
       last_name: personalDetails?.last_name ?? '',
-      phone_number: personalDetails?.phone_number.replace(/^234/, '') ?? '',
+      phone_number: personalDetails?.phone_number.replace(/^\+234/, '0') ?? '',
     });
   }, [
     personalDetails?.email,
