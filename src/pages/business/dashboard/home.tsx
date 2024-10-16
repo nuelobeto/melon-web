@@ -494,7 +494,7 @@ const TransactionDetails = ({
                   Date: {transaction?.created_at}
                 </p>
                 <p className="text-pashBlack-1 text-sm">
-                  Transaction Type: transaction?.point_type
+                  Transaction Type: {transaction?.point_type}
                 </p>
               </div>
 
