@@ -1,6 +1,6 @@
 import {Avatar, AvatarFallback, AvatarImage} from '@/components/ui/avatar';
 import {HomeIcon, SettingsIcon} from '../ui/icons';
-import {NavLink} from 'react-router-dom';
+import {NavLink, useNavigate} from 'react-router-dom';
 import {cn} from '@/lib/utils';
 import {ROUTES} from '@/router/routes';
 import {ScrollArea} from '../ui/scroll-area';
@@ -30,6 +30,8 @@ export const DashboardLayout = ({
   children: React.ReactNode;
   pageTitle: string;
 }) => {
+  const navigate = useNavigate();
+
   return (
     <div className="flex w-screen h-screen">
       <SideBar />
@@ -48,6 +50,9 @@ export const DashboardLayout = ({
             </h1>
           </div>
           <div className="flex items-center gap-4">
+            <Button onClick={() => navigate(ROUTES.sendCustomerReceipt)}>
+              Send customer receipt
+            </Button>
             <Notifications>
               <button className="w-11 h-11 rounded-full bg-mountainAsh-8 flex items-center justify-center">
                 <RiNotification3Line className="text-2xl" />

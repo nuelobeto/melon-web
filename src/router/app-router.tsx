@@ -4,7 +4,6 @@ import {EnterPhone} from '@/pages/customer/auth/enter-phone';
 import {VerifyEmailMobile} from '@/pages/customer/auth/verify-email';
 import {VerifyPhoneMobile} from '@/pages/customer/auth/verify-phone';
 import {DowloadApp} from '@/pages/customer/auth/dowload-app';
-import {WidgetTest} from '@/pages/widget-test';
 import {CreateBusinessAccount} from '@/pages/business/auth/create-business-account';
 import {BusinessSignIn} from '@/pages/business/auth/business-sign-in';
 import {VerifyBusinessAccount} from '@/pages/business/auth/verify-business-account';
@@ -24,6 +23,7 @@ import {MobileGuide} from '@/pages/business/dashboard/settings/guides/mobile-gui
 import {VerifyDirectorPhone} from '@/pages/business/onboarding/verify-director-phone';
 import ProtectedRoutes from '@/components/layouts/ProtectedRoutes';
 import {NotFound} from '@/pages/404';
+import {SendCustomerReceipt} from '@/pages/business/send-customer-receipt';
 
 const AppRouter = () => {
   return (
@@ -110,8 +110,10 @@ const AppRouter = () => {
             />
           </Route>
         </Route>
-
-        <Route path={'/widget'} element={<WidgetTest />} />
+        <Route
+          path={ROUTES.sendCustomerReceipt}
+          element={<SendCustomerReceipt />}
+        />
       </Route>
 
       <Route path="*" element={<NotFound />} />

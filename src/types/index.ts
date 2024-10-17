@@ -142,3 +142,18 @@ export type TotalPatronageT = {
   cumulative_receipts: string;
   month: string;
 };
+
+export type MelonReceiptT = {
+  melon_id?: string;
+  store_name?: string;
+  reference: string;
+  items: ReceiptItemT[];
+  date: string;
+  total_amount: number;
+};
+
+export type ReceiptItemT = {
+  item: string;
+  amount: number;
+  quantity: number;
+};

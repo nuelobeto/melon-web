@@ -28,4 +28,5 @@ export const ROUTES = {
   guides: '/settings/guides',
   webWidgetIntegration: '/settings/guides/web',
   mobileWidgetIntegration: '/settings/guides/mobile',
+  sendCustomerReceipt: '/send-customer-receipt',
 };
