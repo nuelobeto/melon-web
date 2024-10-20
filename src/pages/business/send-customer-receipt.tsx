@@ -136,7 +136,17 @@ export const SendCustomerReceipt = () => {
 
   return (
     <DashboardLayout pageTitle="Dashboard">
-      <Card className="w-full max-w-[500px] mx-auto border shadow-none xs:border mt-10">
+      <div className="md:pt-5 md:px-5">
+        <div className="w-full md:rounded-xl bg-mountainAsh-8 px-6 p-6 flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
+          <p className="text-sm md:text-base text-center text-pashBlack-5 md:text-left">
+            Enter your customer’s phone number or Melon ID to automatically
+            credit their account with reward points for this transaction. Simple
+            and seamless way to ensure customers earn rewards with every
+            purchase.
+          </p>
+        </div>
+      </div>
+      <Card className="w-full max-w-[500px] mx-auto border shadow-none xs:border mt-10 mb-10">
         <CardHeader className="flex flex-row items-center justify-center">
           <img src="/images/logo.png" alt="" width={150} />
         </CardHeader>

@@ -167,6 +167,10 @@ const FormMessage = React.forwardRef<
 });
 FormMessage.displayName = 'FormMessage';
 
+const FormGroup = ({children}: {children: React.ReactNode}) => {
+  return <div className="space-y-2">{children}</div>;
+};
+
 export {
   Form,
   FormItem,
@@ -175,4 +179,5 @@ export {
   FormDescription,
   FormMessage,
   FormField,
+  FormGroup,
 };
