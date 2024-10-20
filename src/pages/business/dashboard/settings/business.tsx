@@ -81,7 +81,7 @@ export const BusinessSettings = () => {
 
   const businessInfo: Detail[] = [
     {
-      label: 'cac_rc_number',
+      label: 'CAC/RC Number',
       value: business?.rc_number ?? null,
       capitilize: true,
     },
