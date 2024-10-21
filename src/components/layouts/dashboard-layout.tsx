@@ -51,7 +51,7 @@ export const DashboardLayout = ({
           </div>
           <div className="flex items-center gap-4">
             <Button onClick={() => navigate(ROUTES.sendCustomerReceipt)}>
-              Send customer receipt
+              Send customer rewards
             </Button>
             <Notifications>
               <button className="w-11 h-11 rounded-full bg-mountainAsh-8 flex items-center justify-center">

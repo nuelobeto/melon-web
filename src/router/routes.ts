@@ -11,6 +11,7 @@ export const ROUTES = {
   verifyBusinessAccount: '/auth/business/verify-email/:email',
   businessAccountVerified: 'business/email-verified/:token',
   businessSignIn: '/auth/business/sign-in',
+  forgotBusinessPassword: '/auth/business/forgot-password',
 
   // business onboarding
   businessOnboarding: '/onboarding/business',

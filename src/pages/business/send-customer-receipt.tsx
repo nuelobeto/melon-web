@@ -43,7 +43,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import {Card, CardContent, CardFooter, CardHeader} from '@/components/ui/card';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {format} from 'date-fns';
 import {Loader2, Plus, Trash2} from 'lucide-react';
 import {Calendar as CalendarIcon} from 'lucide-react';
@@ -134,6 +134,10 @@ export const SendCustomerReceipt = () => {
     }
   };
 
+  useEffect(() => {
+    generateReferenceNumber();
+  }, []);
+
   return (
     <DashboardLayout pageTitle="Dashboard">
       <div className="md:pt-5 md:px-5">
@@ -146,7 +150,7 @@ export const SendCustomerReceipt = () => {
           </p>
         </div>
       </div>
-      <Card className="w-full max-w-[500px] mx-auto border shadow-none xs:border mt-10 mb-10">
+      <Card className="w-full max-w-[600px] mx-auto border shadow-none xs:border mt-10 mb-10">
         <CardHeader className="flex flex-row items-center justify-center">
           <img src="/images/logo.png" alt="" width={150} />
         </CardHeader>
@@ -154,7 +158,7 @@ export const SendCustomerReceipt = () => {
           <>
             <CardContent className="flex flex-col gap-3">
               <div className="flex flex-col gap-2">
-                <Label>Melon ID or Phone number</Label>
+                <Label>Customer's Melon ID or Phone Number</Label>
                 <Input
                   placeholder="MELO12 or +2348012345678"
                   value={melonId}
@@ -164,7 +168,7 @@ export const SendCustomerReceipt = () => {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <Label>Store name</Label>
+                <Label>Business Name</Label>
                 <Input
                   value={storeName}
                   onChange={e => setStoreName(e.target.value)}
@@ -172,7 +176,7 @@ export const SendCustomerReceipt = () => {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <Label>Referrence</Label>
+                <Label>Transaction Reference</Label>
                 <div className="flex items-center gap-2">
                   <Input
                     value={reference}

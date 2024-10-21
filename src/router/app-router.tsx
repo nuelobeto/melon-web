@@ -24,6 +24,7 @@ import {VerifyDirectorPhone} from '@/pages/business/onboarding/verify-director-p
 import ProtectedRoutes from '@/components/layouts/ProtectedRoutes';
 import {NotFound} from '@/pages/404';
 import {SendCustomerReceipt} from '@/pages/business/send-customer-receipt';
+import {ForgotBusinessPassword} from '@/pages/business/auth/forgot-business-password';
 
 const AppRouter = () => {
   return (
@@ -54,6 +55,10 @@ const AppRouter = () => {
         element={<VerifyBusinessAccount />}
       />
       <Route path={ROUTES.businessSignIn} element={<BusinessSignIn />} />
+      <Route
+        path={ROUTES.forgotBusinessPassword}
+        element={<ForgotBusinessPassword />}
+      />
       <Route
         path={ROUTES.businessAccountVerified}
         element={<BusinessAccountVerified />}

@@ -157,6 +157,12 @@ const RegistrationForm = () => {
               </FormItem>
             )}
           />
+          <Link
+            to={ROUTES.forgotBusinessPassword}
+            className="text-darkLime-5 self-end text-sm underline"
+          >
+            Forgot password?
+          </Link>
         </div>
 
         <div className="flex flex-col items-center gap-2">
