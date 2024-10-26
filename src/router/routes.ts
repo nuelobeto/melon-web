@@ -9,9 +9,11 @@ export const ROUTES = {
   // business auth
   createBusinessAccount: '/auth/business/create-account',
   verifyBusinessAccount: '/auth/business/verify-email/:email',
-  businessAccountVerified: 'business/email-verified/:token',
+  businessAccountVerified: '/business/email-verified/:token',
   businessSignIn: '/auth/business/sign-in',
   forgotBusinessPassword: '/auth/business/forgot-password',
+  forgotPasswordSuccess: '/auth/business/forgot-password/:email',
+  resetPassword: '/business/forget-password/:token',
 
   // business onboarding
   businessOnboarding: '/onboarding/business',

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {AuthLayout, Main, SideBar} from '@/components/layouts/auth-layout';
+import {LogoWhite} from '@/components/ui/logo';
+import {ScrollArea} from '@/components/ui/scroll-area';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
@@ -13,10 +14,9 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
-
 import {Link, useNavigate} from 'react-router-dom';
 import {ROUTES} from '@/router/routes';
-import {Loader2} from 'lucide-react';
+import {Eye, EyeOff, Loader2} from 'lucide-react';
 import {ApiResponseT, LoginT} from '@/types';
 import {useEffect, useState} from 'react';
 import authServices from '@/services/auth';
@@ -25,18 +25,19 @@ import {useFetchBusiness} from '@/hooks/business';
 import {useBusiness} from '@/store/useBusiness';
 import {emailSchema, passwordSchema} from '@/helpers/zod-schema';
 
-export const ForgotBusinessPassword = () => {
+const formSchema = z.object({
+  business_email: emailSchema('Please enter your business email.'),
+  password: passwordSchema(),
+});
+
+export const BusinessSignIn = () => {
   const {setUser} = useAuth();
   const {business} = useBusiness();
-
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [showPassword, setShowpassword] = useState(false);
 
-  const formSchema = z.object({
-    business_email: emailSchema('Please enter your business email.'),
-    password: passwordSchema(),
-  });
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -44,7 +45,6 @@ export const ForgotBusinessPassword = () => {
       business_email: '',
       password: '',
     },
-    mode: 'onBlur',
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -66,8 +66,6 @@ export const ForgotBusinessPassword = () => {
       setLoading(false);
     }
   }
-
-  useFetchBusiness();
 
   useEffect(() => {
     if (!success || !business) return;
@@ -91,26 +89,29 @@ export const ForgotBusinessPassword = () => {
       navigate(ROUTES.home);
     }
   }, [business, navigate, success]);
-  return (
-    <AuthLayout>
-      <SideBar />
 
-      <Main>
-        <div className="w-full h-full mx-auto max-w-[500px] px-5 flex flex-col items-center justify-center gap-6">
+  useFetchBusiness();
+
+  return (
+    <main className="w-screen h-screen bg-[#081623] bg-[url('/images/auth-bg.svg')] bg-no-repeat bg-cover">
+      <ScrollArea className="w-full h-full">
+        <div className="w-full h-full py-[124px] px-6">
+          <LogoWhite className="w-[199.2px] mb-[49px] mx-auto" />
+
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="w-full flex flex-col gap-6"
+              className="w-full max-w-[550px] mx-auto flex flex-col gap-6 px-5 sm:px-[46px] py-[39px] rounded-3xl bg-white"
             >
               <div className="flex flex-col gap-2">
-                <h1 className="font-semibold text-4xl text-pashBlack-1 text-center">
-                  Forgot your password?
+                <h1 className="font-semibold text-3xl lg:text-4xl text-pashBlack-1 text-center">
+                  Welcome Back!
                 </h1>
-                <p className="text-base text-pashBlack-3 text-center">
-                  Please enter the email address associated with your account
-                  and we'll email you a link to reset your password.
+                <p className="text-sm text-pashBlack-4 text-center">
+                  Log In to your account to continue.
                 </p>
               </div>
+
               <div className="flex flex-col gap-4">
                 <FormField
                   control={form.control}
@@ -130,27 +131,74 @@ export const ForgotBusinessPassword = () => {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({field}) => (
+                    <FormItem>
+                      <FormLabel>Enter Password</FormLabel>
+                      <FormControl>
+                        <div className="flex items-center relative">
+                          <Input
+                            type={!showPassword ? 'password' : 'text'}
+                            placeholder="Create a password"
+                            {...field}
+                            className="h-12 pr-9"
+                          />
+                          <button
+                            type="button"
+                            className="absolute right-2.5"
+                            onClick={() => setShowpassword(!showPassword)}
+                          >
+                            {!showPassword ? (
+                              <Eye className="w-5 h-5 text-pashBlack-8" />
+                            ) : (
+                              <EyeOff className="w-5 h-5 text-pashBlack-8" />
+                            )}
+                          </button>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex items-center gap-1 text-sm">
+                  <span className="text-pashBlack-3">Forgot password?</span>
+                  <Link
+                    to={ROUTES.forgotBusinessPassword}
+                    className="text-pink-1 underline"
+                  >
+                    Reset here
+                  </Link>
+                </div>
               </div>
 
               <div className="flex flex-col items-center gap-2">
-                <Button type="submit" className="h-12 w-full" disabled={true}>
+                <Button
+                  type="submit"
+                  className="h-12 w-full"
+                  disabled={loading}
+                >
                   {loading ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
-                    'Send reset link'
+                    'Log In'
                   )}
                 </Button>
-                <Link
-                  to={ROUTES.businessSignIn}
-                  className="text-darkLime-5 text-sm underline flex items-center"
-                >
-                  Return to Log in
-                </Link>
+                <p className="font-medium text-sm text-pashBlack-4 text-center">
+                  New to Melon?{' '}
+                  <Link
+                    to={ROUTES.createBusinessAccount}
+                    className="text-pashBlack-1"
+                  >
+                    Create an ccount
+                  </Link>
+                </p>
               </div>
             </form>
           </Form>
         </div>
-      </Main>
-    </AuthLayout>
+      </ScrollArea>
+    </main>
   );
 };

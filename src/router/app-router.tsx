@@ -4,10 +4,6 @@ import {EnterPhone} from '@/pages/customer/auth/enter-phone';
 import {VerifyEmailMobile} from '@/pages/customer/auth/verify-email';
 import {VerifyPhoneMobile} from '@/pages/customer/auth/verify-phone';
 import {DowloadApp} from '@/pages/customer/auth/dowload-app';
-import {CreateBusinessAccount} from '@/pages/business/auth/create-business-account';
-import {BusinessSignIn} from '@/pages/business/auth/business-sign-in';
-import {VerifyBusinessAccount} from '@/pages/business/auth/verify-business-account';
-import {BusinessAccountVerified} from '@/pages/business/auth/business-account-verified';
 import {BusinessPersonalDetails} from '@/pages/business/onboarding/business-personal-details';
 import {BusinessOnboarding} from '@/pages/business/onboarding/business-onboarding';
 import {BusinessDetails} from '@/pages/business/onboarding/business-details';
@@ -24,14 +20,20 @@ import {VerifyDirectorPhone} from '@/pages/business/onboarding/verify-director-p
 import ProtectedRoutes from '@/components/layouts/ProtectedRoutes';
 import {NotFound} from '@/pages/404';
 import {SendCustomerReceipt} from '@/pages/business/send-customer-receipt';
-import {ForgotBusinessPassword} from '@/pages/business/auth/forgot-business-password';
+import {CreateBusinessAccount} from '@/pages/business/auth/create-account';
+import {BusinessSignIn} from '@/pages/business/auth/login';
+import {BusinessAccountVerified} from '@/pages/business/auth/account-verified';
+import {VerifyBusinessAccount} from '@/pages/business/auth/verify-email';
+import {ForgotPassword} from '@/pages/business/auth/forgot-password';
+import {ForgotPasswordSuccess} from '@/pages/business/auth/forgot-password-success';
+import {ResetPassword} from '@/pages/business/auth/reset-password';
 
 const AppRouter = () => {
   return (
     <Routes>
       <Route
         path="/"
-        element={<Navigate to={ROUTES.createBusinessAccount} replace={true} />}
+        element={<Navigate to={ROUTES.businessSignIn} replace={true} />}
       />
 
       {/* customer onboarding */}
@@ -56,13 +58,22 @@ const AppRouter = () => {
       />
       <Route path={ROUTES.businessSignIn} element={<BusinessSignIn />} />
       <Route
-        path={ROUTES.forgotBusinessPassword}
-        element={<ForgotBusinessPassword />}
+        path={ROUTES.businessAccountVerified}
+        element={<BusinessAccountVerified />}
       />
       <Route
         path={ROUTES.businessAccountVerified}
         element={<BusinessAccountVerified />}
       />
+      <Route
+        path={ROUTES.forgotBusinessPassword}
+        element={<ForgotPassword />}
+      />
+      <Route
+        path={ROUTES.forgotPasswordSuccess}
+        element={<ForgotPasswordSuccess />}
+      />
+      <Route path={ROUTES.resetPassword} element={<ResetPassword />} />
 
       {/* Onboarding */}
       <Route path={ROUTES.businessOnboarding} element={<BusinessOnboarding />}>

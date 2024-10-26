@@ -1,5 +1,5 @@
 import apiClient from '@/config/axiosInstance';
-import {CreateAccountT, CreateBusinessT, LoginT} from '@/types';
+import {CreateAccountT, CreateBusinessT, LoginT, ResetPasswordT} from '@/types';
 
 const verifyEmail = async (token: string) => {
   const res = await apiClient.get(`/users/email-verified/${token}`);
@@ -54,6 +54,16 @@ const verifyBusinessEmail = async (token: string) => {
   return res.data;
 };
 
+const forgotPassword = async (email: string) => {
+  const res = await apiClient.get(`/businesses/forget-password/${email}`);
+  return res.data;
+};
+
+const resetPassword = async (payload: ResetPasswordT) => {
+  const res = await apiClient.post(`/businesses/reset-password/`, payload);
+  return res.data;
+};
+
 const authServices = {
   verifyEmail,
   resendEmailOtp,
@@ -65,6 +75,8 @@ const authServices = {
   login,
   resendBusinessEmailOtp,
   verifyBusinessEmail,
+  forgotPassword,
+  resetPassword,
 };
 
 export default authServices;
