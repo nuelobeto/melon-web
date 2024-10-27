@@ -17,7 +17,7 @@ import {ScrollArea} from '@/components/ui/scroll-area';
 import {emailSchema} from '@/helpers/zod-schema';
 import {useState} from 'react';
 import {Loader2} from 'lucide-react';
-import {useNavigate} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import {ROUTES} from '@/router/routes';
 import {ApiResponseT} from '@/types';
 import authServices from '@/services/auth';
@@ -111,6 +111,12 @@ export const ForgotPassword = () => {
                     'Get Password Reset Link'
                   )}
                 </Button>
+                <p className="font-medium text-sm text-pashBlack-4 text-center">
+                  Remember your password?{' '}
+                  <Link to={ROUTES.businessSignIn} className="text-pashBlack-1">
+                    Sign in
+                  </Link>
+                </p>
               </div>
             </form>
           </Form>

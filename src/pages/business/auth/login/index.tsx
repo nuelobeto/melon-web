@@ -141,7 +141,7 @@ export const BusinessSignIn = () => {
                         <div className="flex items-center relative">
                           <Input
                             type={!showPassword ? 'password' : 'text'}
-                            placeholder="Create a password"
+                            placeholder="Enter password"
                             {...field}
                             className="h-12 pr-9"
                           />
