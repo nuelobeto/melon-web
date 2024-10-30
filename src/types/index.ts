@@ -162,3 +162,5 @@ export type ReceiptItemT = {
   amount: number;
   quantity: number;
 };
+
+export type PointTypeT = 'standard' | 'offer' | 'referral';

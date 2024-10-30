@@ -21,8 +21,11 @@ export const uploadToCloudinary = async (file: File | undefined) => {
   };
 };
 
-export function formatDateToCustomTimestamp(date: Date): string {
-  const day = date.getDate();
+export function formatDateToCustomTimestamp(date: Date | string): string {
+  // Convert the date to a Date object if it is a string
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+
+  const day = dateObj.getDate();
   const monthNames = [
     'Jan',
     'Feb',
@@ -37,8 +40,8 @@ export function formatDateToCustomTimestamp(date: Date): string {
     'Nov',
     'Dec',
   ];
-  const month = monthNames[date.getMonth()];
-  const year = date.getFullYear();
+  const month = monthNames[dateObj.getMonth()];
+  const year = dateObj.getFullYear();
 
   // Handle the ordinal suffix (st, nd, rd, th)
   const getOrdinalSuffix = (day: number): string => {
@@ -55,9 +58,9 @@ export function formatDateToCustomTimestamp(date: Date): string {
     }
   };
 
-  const hours = date.getHours() % 12 || 12; // Convert 24-hour time to 12-hour time
-  const minutes = date.getMinutes().toString().padStart(2, '0');
-  const ampm = date.getHours() >= 12 ? 'pm' : 'am';
+  const hours = dateObj.getHours() % 12 || 12; // Convert 24-hour time to 12-hour time
+  const minutes = dateObj.getMinutes().toString().padStart(2, '0');
+  const ampm = dateObj.getHours() >= 12 ? 'pm' : 'am';
 
   const dayWithSuffix = `${day}${getOrdinalSuffix(day)}`;
 

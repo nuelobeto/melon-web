@@ -30,7 +30,7 @@ export const CodeBlock = ({code}: {code: string}) => {
         )}
         Copy
       </Button>
-      <code className="w-full rounded-lg bg-pashBlack-2 text-pashBlack-9 text-sm">
+      <code className="w-full rounded-lg bg-[#081623] text-pashBlack-9 text-sm">
         <pre className="p-4 overflow-auto">{code}</pre>
       </code>
     </div>

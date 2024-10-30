@@ -3,5 +3,9 @@
 @tailwind utilities;
 
 * {
-  font-family: "Archivo", sans-serif;
+  font-family: "Figtree", sans-serif;
+}
+
+.figtree {
+  font-family: "Figtree", sans-serif;
 }

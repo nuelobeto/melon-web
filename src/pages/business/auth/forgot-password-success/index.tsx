@@ -40,7 +40,7 @@ export const ForgotPasswordSuccess = () => {
 
           <div className="w-full max-w-[520px] mx-auto flex flex-col gap-6 px-5 sm:px-[46px] py-[39px] rounded-3xl bg-white">
             <div className="flex flex-col gap-2">
-              <div className="w-[114px] h-[114px] rounded-full mx-auto bg-[#FFEFF6] mb-[26px] flex items-center justify-center">
+              <div className="w-[117px] h-[117px] rounded-full mx-auto mb-[26px] flex items-center justify-center">
                 <img
                   src="/images/success.svg"
                   alt=""

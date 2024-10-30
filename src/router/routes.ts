@@ -20,11 +20,16 @@ export const ROUTES = {
   businessPersonalDetails: '/onboarding/business/personal-details',
   businessDetails: '/onboarding/business/details',
   businessDirectorDetails: '/onboarding/business/director-details',
-  verifyDirectorPhone: '/onboarding/business/verify-phone/:phone',
   businessOnboardingSuccess: '/onboarding/business/success',
 
   // dashboard
+  getStarted: '/get-started',
+  docs: '/documentation',
+  webDocs: '/documentation/web',
+  mobileDocs: '/documentation/mobile',
   home: '/home',
+  transactions: '/transactions',
+  sendReward: '/send-reward',
   settings: '/settings',
   businessSettngs: '/settings/business',
   profileSettngs: '/settings/profile',
@@ -32,4 +37,11 @@ export const ROUTES = {
   webWidgetIntegration: '/settings/guides/web',
   mobileWidgetIntegration: '/settings/guides/mobile',
   sendCustomerReceipt: '/send-customer-receipt',
+
+  // registration
+  registeredBusinessRegistration: '/onboarding/resgistered-business',
+  verifyDirectorPhone: '/onboarding/business/verify-phone/:phone',
+  unRegisteredBusinessRegistration: '/onboarding/unresgistered-business',
+  verifyOwnerPhone: '/onboarding/business/owner/verify-phone/:phone',
+  registrationSuccess: '/onboarding/success',
 };

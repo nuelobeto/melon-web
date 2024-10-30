@@ -73,18 +73,7 @@ export const BusinessSignIn = () => {
     setSuccess(false);
 
     if (!business.profile_completed) {
-      navigate(ROUTES.businessOnboarding);
-    } else if (
-      business.profile_completed &&
-      !business.director_phone_verified
-    ) {
-      const savedDirectorPhone: string | null =
-        localStorage.getItem('director-phone');
-      const directorPhone: string = savedDirectorPhone
-        ? JSON.parse(savedDirectorPhone)
-        : '';
-
-      navigate(ROUTES.verifyDirectorPhone.replace(':phone', directorPhone));
+      navigate(ROUTES.getStarted);
     } else {
       navigate(ROUTES.home);
     }
@@ -191,7 +180,7 @@ export const BusinessSignIn = () => {
                     to={ROUTES.createBusinessAccount}
                     className="text-pashBlack-1"
                   >
-                    Create an ccount
+                    Create an account
                   </Link>
                 </p>
               </div>
