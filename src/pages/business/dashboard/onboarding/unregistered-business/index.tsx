@@ -1,11 +1,12 @@
 import {DashboardLayout} from '@/components/layouts/dashboard';
 import {cn} from '@/lib/utils';
 import {ArrowLeft} from 'lucide-react';
-import {useEffect, useMemo, useState} from 'react';
+import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {IdentityVerification} from '../identity-verification';
 import {BusinessSocials} from '../business_socials';
 import {BusinessDetails} from '../business-details';
+import {RegistrationStageT} from '@/types';
 
 export type SectionValueT =
   | 'identity_verification'
@@ -37,24 +38,7 @@ export const UnRegisteredBusinessRegistration = () => {
   const [currentSection, setCurrentSection] = useState<SectionValueT>(
     'identity_verification',
   );
-
-  const completed: SectionValueT[] = useMemo(() => {
-    return ['identity_verification', 'business_details'];
-  }, []);
-
-  useEffect(() => {
-    const lastCompletedIndex =
-      completed.length > 0
-        ? sections.findIndex(
-            section => section.value === completed[completed.length - 1],
-          )
-        : -1;
-    const nextSectionIndex = lastCompletedIndex + 1;
-
-    if (nextSectionIndex < sections.length) {
-      setCurrentSection(sections[nextSectionIndex].value);
-    }
-  }, [completed]);
+  const [completed, setCompleted] = useState<RegistrationStageT[]>([]);
 
   return (
     <DashboardLayout pageTitle={<PageTitle />}>
@@ -62,9 +46,9 @@ export const UnRegisteredBusinessRegistration = () => {
         <div className="w-full h-full max-w-[602px] mx-auto">
           <nav className="py-4 px-6 flex items-center gap-7 rounded-full bg-white">
             {sections.map((section, index) => {
-              const isDisabled = sections
-                .slice(0, index)
-                .some(prevSection => !completed.includes(prevSection.value));
+              // const isDisabled = sections
+              //   .slice(0, index)
+              //   .some(prevSection => !completed.includes(prevSection.value));
 
               return (
                 <button
@@ -74,7 +58,7 @@ export const UnRegisteredBusinessRegistration = () => {
                     section.value === currentSection
                       ? 'text-pashBlack-1 font-medium'
                       : 'text-pashBlack-7',
-                    isDisabled ? 'pointer-events-none' : '',
+                    // isDisabled ? 'pointer-events-none' : '',
                   )}
                   onClick={() => setCurrentSection(section.value)}
                 >
@@ -99,12 +83,19 @@ export const UnRegisteredBusinessRegistration = () => {
               <IdentityVerification />
             )}
             {currentSection === 'business_details' && (
-              <BusinessDetails setCurrentSection={setCurrentSection} />
+              <BusinessDetails
+                setCurrentSection={setCurrentSection}
+                setCompleted={setCompleted}
+                business_type="unregistered"
+                completed={completed}
+              />
             )}
             {currentSection === 'business_socials' && (
               <BusinessSocials
                 setCurrentSection={setCurrentSection}
+                setCompleted={setCompleted}
                 business_type="unregistered"
+                completed={completed}
               />
             )}
           </div>

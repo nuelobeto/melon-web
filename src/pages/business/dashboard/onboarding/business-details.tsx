@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {emailSchema, phoneNumberSchema} from '@/helpers/zod-schema';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
 import {Button} from '@/components/ui/button';
@@ -23,56 +24,86 @@ import {
 } from '@/components/ui/select';
 import {cn} from '@/lib/utils';
 import {BUSINESS_CHANNELS, INDUSTRIES} from '@/constants';
-import {CountryCodeType} from '@/types';
+import {
+  CountryCodeType,
+  RegistrationStageT,
+  UpdateBusinessDetailsT,
+} from '@/types';
 import {CountryCode} from '@/components/ui/country-code';
-import {SectionValueT} from './unregistered-business';
+import {useAuth} from '@/store/useAuth';
+import {useFetchBusiness} from '@/hooks/useQueries';
+import {useMutation, useQueryClient} from '@tanstack/react-query';
+import businessServices from '@/services/business';
+import {toast} from 'react-toastify';
+import {Loader2} from 'lucide-react';
+import {uploadToCloudinary} from '@/helpers';
 
 type Props = {
-  setCurrentSection: React.Dispatch<React.SetStateAction<SectionValueT>>;
+  setCurrentSection: React.Dispatch<React.SetStateAction<RegistrationStageT>>;
+  setCompleted: React.Dispatch<React.SetStateAction<RegistrationStageT[]>>;
+  completed: RegistrationStageT[];
+  business_type: 'registered' | 'unregistered';
 };
 
-const formSchema = z.object({
-  rc_number: z.string().min(1, {
-    message: 'Enter RC number',
-  }),
-  name: z.string().min(1, {
-    message: 'Enter business name',
-  }),
-  email: emailSchema('Enter business email'),
-  phone_number: phoneNumberSchema('Enter business phone number'),
-  industry: z.string().min(1, {
-    message: 'Select business industry',
-  }),
-  channel: z.string().min(1, {
-    message: 'Please enter your business channel',
-  }),
-  country: z.string().min(1, {
-    message: 'Enter country',
-  }),
-  state: z.string().min(1, {
-    message: 'Enter state',
-  }),
-  city: z.string().min(1, {
-    message: 'Enter city',
-  }),
-  street: z.string().min(1, {
-    message: 'Enter street',
-  }),
-});
+export const BusinessDetails = ({
+  setCurrentSection,
+  setCompleted,
+  completed,
+  business_type,
+}: Props) => {
+  const queryClient = useQueryClient();
 
-export const BusinessDetails = ({setCurrentSection}: Props) => {
-  const [image, setImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const {user} = useAuth();
+  const {data: business} = useFetchBusiness({
+    businessId: user?.business_id as string,
+  });
+
+  const [file, setFile] = useState<File | undefined>(undefined);
+  const [logo, setLogo] = useState<string | null>(null);
   const [selectedCountryCode, setSelectedCountryCode] =
     useState<CountryCodeType | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && file.type.startsWith('image/')) {
-      setImage(file);
-      setImagePreview(URL.createObjectURL(file)); // Create a preview URL
+      setFile(file);
+      const imageURL = URL.createObjectURL(file);
+      setLogo(imageURL);
     }
   };
+
+  const formSchema = z.object({
+    rc_number:
+      business_type === 'registered'
+        ? z.string().min(1, {
+            message: 'Enter RC number',
+          })
+        : z.string().optional(),
+    name: z.string().min(1, {
+      message: 'Enter business name',
+    }),
+    email: emailSchema('Enter business email'),
+    phone_number: phoneNumberSchema('Enter business phone number'),
+    industry: z.string().min(1, {
+      message: 'Select business industry',
+    }),
+    channel: z.string().min(1, {
+      message: 'Please enter your business channel',
+    }),
+    website_link: z.string().optional(),
+    country: z.string().min(1, {
+      message: 'Enter country',
+    }),
+    state: z.string().min(1, {
+      message: 'Enter state',
+    }),
+    city: z.string().min(1, {
+      message: 'Enter city',
+    }),
+    street: z.string().min(1, {
+      message: 'Enter street',
+    }),
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -83,6 +114,7 @@ export const BusinessDetails = ({setCurrentSection}: Props) => {
       phone_number: '',
       industry: '',
       channel: '',
+      website_link: '',
       country: '',
       state: '',
       city: '',
@@ -91,21 +123,122 @@ export const BusinessDetails = ({setCurrentSection}: Props) => {
   });
 
   const isBtnActive =
-    !!form.watch('rc_number') &&
-    !!form.watch('name') &&
-    !!form.watch('email') &&
-    !!form.watch('phone_number') &&
-    !!form.watch('industry');
-  !!form.watch('channel') &&
-    !!form.watch('country') &&
-    !!form.watch('state') &&
-    !!form.watch('city') &&
-    !!form.watch('street');
+    (!!form.watch('name') &&
+      !!form.watch('email') &&
+      !!form.watch('phone_number') &&
+      !!form.watch('industry') &&
+      !!form.watch('channel') &&
+      !!form.watch('country') &&
+      !!form.watch('state') &&
+      !!form.watch('city') &&
+      !!form.watch('street') &&
+      business_type === 'unregistered') ||
+    !!form.watch('rc_number');
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log({values}, {image});
-    setCurrentSection('business_socials');
+  const {mutate, status} = useMutation({
+    mutationFn: businessServices.updateBusinessDetails,
+    onSuccess: () => {
+      setCurrentSection('business_socials');
+      queryClient.invalidateQueries({
+        queryKey: ['business'],
+      });
+    },
+    onError: (error: any) => {
+      toast.error(
+        error.response?.data?.message || 'Error updating business details',
+      );
+    },
+  });
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const newLogo: string | null = file
+        ? (await uploadToCloudinary(file)).url
+        : logo;
+
+      // Build commonDetails object and conditionally include website_link
+      const commonDetails = {
+        logo: newLogo,
+        name: values.name,
+        phone_number: `+${
+          selectedCountryCode?.callingCode
+        }${values.phone_number.slice(1)}`,
+        industry: values.industry,
+        channel: values.channel,
+        country: values.country,
+        state: values.state,
+        city: values.city,
+        street: values.street,
+        type: business_type,
+        ...(values.website_link && {website_link: values.website_link}), // Only add if not an empty string
+      };
+
+      // Add RC number only if business type is 'registered'
+      const details =
+        business_type === 'registered'
+          ? {...commonDetails, rc_number: values.rc_number}
+          : commonDetails;
+
+      const payload: UpdateBusinessDetailsT = {
+        details,
+        business_id: business?.data?.id,
+      };
+
+      mutate(payload);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      // Optionally, handle or display the error here
+    }
   }
+
+  useEffect(() => {
+    return () => {
+      if (logo) {
+        URL.revokeObjectURL(logo);
+      }
+    };
+  }, [logo]);
+
+  useEffect(() => {
+    if (business && business.data && business.data.details) {
+      setLogo(business.data.details.logo);
+      form.reset({
+        rc_number: business.data.details.rc_number ?? '',
+        name: business.data.details.name ?? '',
+        email: business.data.details.business_email ?? '',
+        phone_number: business.data.details.phone_number
+          ? business.data.details.phone_number.replace(/^(\+234)/, '0')
+          : '',
+        industry: business.data.details.industry ?? '',
+        channel: business.data.details.channel ?? '',
+        website_link: business.data.details.website_link ?? '',
+        country: business.data.details.country ?? '',
+        state: business.data.details.state ?? '',
+        city: business.data.details.city ?? '',
+        street: business.data.details.street ?? '',
+      });
+    }
+  }, [business, form]);
+
+  useEffect(() => {
+    if (business && business.data && business.data.details) {
+      if (
+        !!business.data.details.rc_number &&
+        !!business.data.details.name &&
+        !!business.data.details.business_email &&
+        !!business.data.details.phone_number &&
+        !!business.data.details.industry &&
+        !!business.data.details.channel &&
+        !!business.data.details.website_link &&
+        !!business.data.details.country &&
+        !!business.data.details.state &&
+        !!business.data.details.city &&
+        !!business.data.details.street
+      ) {
+        setCompleted([...completed, 'business_details']);
+      }
+    }
+  }, [business, completed, setCompleted]);
 
   return (
     <Form {...form}>
@@ -126,12 +259,9 @@ export const BusinessDetails = ({setCurrentSection}: Props) => {
 
             <div className="mt-6 space-y-6">
               <div className="w-full p-5 border border-dashed border-mountainAsh-1 bg-mountainAsh-10 rounded-md flex flex-col items-center">
-                {imagePreview ? (
+                {logo ? (
                   <div className="w-[100px] h-[100px] rounded-full p-4 border border-mountainAsh-1 bg-mountainAsh-8">
-                    <img
-                      src={imagePreview}
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={logo} className="w-full h-full object-cover" />
                   </div>
                 ) : (
                   <div className="w-10 h-10 rounded-full bg-mountainAsh-7 flex items-center justify-center">
@@ -144,7 +274,7 @@ export const BusinessDetails = ({setCurrentSection}: Props) => {
                   </div>
                 )}
 
-                {imagePreview ? (
+                {logo ? (
                   <div className="w-full flex items-center justify-center gap-3 mt-3">
                     <div className="">
                       <label
@@ -163,8 +293,7 @@ export const BusinessDetails = ({setCurrentSection}: Props) => {
                     <button
                       className="text-sm text-pashBlack-1 font-semibold text-center cursor-pointer h-10 px-4 py-2 rounded-lg border border-mountainAsh-1 bg-gradient-to-b from-[#F5F6F8] to-[#d2d9e99e]"
                       onClick={() => {
-                        setImage(null);
-                        setImagePreview(null);
+                        setLogo(null);
                       }}
                     >
                       Remove logo
@@ -198,23 +327,25 @@ export const BusinessDetails = ({setCurrentSection}: Props) => {
                   </div>
                 )}
               </div>
-              <FormField
-                control={form.control}
-                name="rc_number"
-                render={({field}) => (
-                  <FormItem>
-                    <FormLabel>RC Number</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter RC number"
-                        {...field}
-                        className="h-12"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {business_type === 'registered' && (
+                <FormField
+                  control={form.control}
+                  name="rc_number"
+                  render={({field}) => (
+                    <FormItem>
+                      <FormLabel>RC Number</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Enter RC number"
+                          {...field}
+                          className="h-12"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
               <FormField
                 control={form.control}
                 name="name"
@@ -226,6 +357,7 @@ export const BusinessDetails = ({setCurrentSection}: Props) => {
                         placeholder="Enter business name"
                         {...field}
                         className="h-12"
+                        disabled
                       />
                     </FormControl>
                     <FormMessage />
@@ -243,6 +375,7 @@ export const BusinessDetails = ({setCurrentSection}: Props) => {
                         placeholder="Enter business email"
                         {...field}
                         className="h-12"
+                        disabled
                       />
                     </FormControl>
                     <FormMessage />
@@ -336,6 +469,24 @@ export const BusinessDetails = ({setCurrentSection}: Props) => {
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="website_link"
+                render={({field}) => (
+                  <FormItem>
+                    <FormLabel>
+                      Website Link{' '}
+                      <span className="text-pashBlack-6">(optional)</span>
+                    </FormLabel>
+                    <Input
+                      {...field}
+                      placeholder="Enter website link"
+                      className="h-12"
+                    />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <div className="space-y-1">
                 <h1 className="text-3xl font-medium text-pashBlack-1">
@@ -424,9 +575,13 @@ export const BusinessDetails = ({setCurrentSection}: Props) => {
             type="submit"
             size={'lg'}
             className="w-full"
-            disabled={!isBtnActive}
+            disabled={!isBtnActive || status === 'pending'}
           >
-            Continue
+            {status === 'pending' ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              'Continue'
+            )}
           </Button>
         </div>
       </form>

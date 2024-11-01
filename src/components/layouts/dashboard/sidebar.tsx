@@ -1,22 +1,21 @@
 import {ChevronDown, LogOut} from 'lucide-react';
 import {NavLink} from 'react-router-dom';
-import {useBusiness} from '@/store/useBusiness';
 import {useAuth} from '@/store/useAuth';
-import {useFetchPersonalDetails} from '@/hooks/business';
 import {Avatar, AvatarFallback, AvatarImage} from '../../ui/avatar';
 import {navlinks} from '@/constants/navlinks';
 import {cn} from '@/lib/utils';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
+import {useFetchBusiness} from '@/hooks/useQueries';
 
 export const SideBar = () => {
-  const {logout} = useAuth();
-  const {business, personalDetails} = useBusiness();
+  const {user, logout} = useAuth();
+  const {data: business} = useFetchBusiness({
+    businessId: user?.business_id as string,
+  });
 
   function truncateString(input: string, maxLength: number = 20): string {
     return input.length > maxLength ? `${input.slice(0, maxLength)}...` : input;
   }
-
-  useFetchPersonalDetails();
 
   return (
     <aside className="min-w-64 h-full bg-[#081623] hidden min-[900px]:block">
@@ -26,22 +25,24 @@ export const SideBar = () => {
             <button className="w-full h-16 flex items-center justify-between">
               <div className="flex items-center gap-2 overflow-hidden">
                 <Avatar className="w-8 h-8">
-                  <AvatarImage src={business?.logo ?? undefined} />
+                  <AvatarImage
+                    src={business?.data?.details?.logo ?? undefined}
+                  />
                   <AvatarFallback className="text-pashBlack-1">
-                    {business?.name.charAt(0)}
+                    {business?.data?.details?.name?.charAt(0) ?? ''}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col max-w-[140px]">
                   <h2 className="font-medium text-sm text-white whitespace-nowrap">
-                    {truncateString(business?.name ?? '')}
+                    {truncateString(business?.data?.details?.name ?? '')}
                   </h2>
-                  <p className="text-xs text-mountainAsh-1 whitespace-nowrap">
+                  {/* <p className="text-xs text-mountainAsh-1 whitespace-nowrap">
                     {truncateString(
                       `${personalDetails?.first_name ?? ''} ${
                         personalDetails?.last_name ?? ''
                       }`,
                     )}
-                  </p>
+                  </p> */}
                 </div>
               </div>
               <span>

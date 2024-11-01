@@ -2,7 +2,6 @@ import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {ScrollArea} from '@/components/ui/scroll-area';
-import api from '@/services';
 import {MelonReceiptT, ReceiptItemT} from '@/types';
 import {format} from 'date-fns';
 import {useEffect, useState} from 'react';
@@ -10,6 +9,7 @@ import {Calendar as CalendarIcon, Plus, Trash2} from 'lucide-react';
 import {cn} from '@/lib/utils';
 import {Calendar} from '@/components/ui/calendar';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
+import businessServices from '@/services/business';
 
 export const Manual = () => {
   const [melonId, setMelonId] = useState('');
@@ -76,7 +76,7 @@ export const Manual = () => {
     };
     setLoading(true);
     try {
-      const res = await api.sendReceipt(payload, apiKey);
+      const res = await businessServices.sendReceipt(payload, apiKey);
       if (res.status === 'success') {
         setLoading(false);
         setSuccess(true);
@@ -278,7 +278,7 @@ export const Manual = () => {
           onClick={handleSendReceipt}
           disabled={loading}
         >
-          Generate
+          Submit
         </Button>
       </div>
     </div>

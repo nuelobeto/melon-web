@@ -1,6 +1,5 @@
 import {DashboardLayout} from '@/components/layouts/dashboard';
-import {ArrowLeft, ChevronDown} from 'lucide-react';
-import {useNavigate} from 'react-router-dom';
+import {ChevronDown} from 'lucide-react';
 import {formatDateToCustomTimestamp} from '@/helpers';
 import {
   ColumnDef,
@@ -21,22 +20,23 @@ import {
 } from '@/components/ui/table';
 import {ChevronRight} from 'lucide-react';
 import {Badge} from '@/components/ui/badge';
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {Button} from '@/components/ui/button';
 import {PointTypeT} from '@/types';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from '@/components/ui/select';
 import {format} from 'date-fns';
 import {DateRange} from 'react-day-picker';
 import {cn} from '@/lib/utils';
 import {Calendar} from '@/components/ui/calendar';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Pagination} from '@/components/ui/pagination';
+import {useFetchActivities} from '@/hooks/useQueries';
 
 type TransactionT = {
   id: string;
@@ -47,94 +47,12 @@ type TransactionT = {
   point_type: PointTypeT;
 };
 
-const transactions: TransactionT[] = [
-  {
-    id: '1',
-    date: '2024-10-27T07:01:28.330Z',
-    transaction_id: 'TXN123456',
-    melon_id: 'MEL123456',
-    amount: '100000',
-    point_type: 'standard',
-  },
-  {
-    id: '2',
-    date: '2024-10-28T09:15:30.530Z',
-    transaction_id: 'TXN123457',
-    melon_id: 'MEL123457',
-    amount: '200000',
-    point_type: 'offer',
-  },
-  {
-    id: '3',
-    date: '2024-10-29T11:22:45.150Z',
-    transaction_id: 'TXN123458',
-    melon_id: 'MEL123458',
-    amount: '150000',
-    point_type: 'standard',
-  },
-  {
-    id: '4',
-    date: '2024-10-30T14:05:10.780Z',
-    transaction_id: 'TXN123459',
-    melon_id: 'MEL123459',
-    amount: '250000',
-    point_type: 'offer',
-  },
-  {
-    id: '5',
-    date: '2024-10-31T16:20:05.940Z',
-    transaction_id: 'TXN123460',
-    melon_id: 'MEL123460',
-    amount: '300000',
-    point_type: 'standard',
-  },
-  {
-    id: '6',
-    date: '2024-11-01T08:45:30.120Z',
-    transaction_id: 'TXN123461',
-    melon_id: 'MEL123461',
-    amount: '175000',
-    point_type: 'offer',
-  },
-  {
-    id: '7',
-    date: '2024-11-02T10:32:55.640Z',
-    transaction_id: 'TXN123462',
-    melon_id: 'MEL123462',
-    amount: '225000',
-    point_type: 'standard',
-  },
-  {
-    id: '8',
-    date: '2024-11-03T13:15:47.890Z',
-    transaction_id: 'TXN123463',
-    melon_id: 'MEL123463',
-    amount: '275000',
-    point_type: 'offer',
-  },
-  {
-    id: '9',
-    date: '2024-11-04T15:02:39.210Z',
-    transaction_id: 'TXN123464',
-    melon_id: 'MEL123464',
-    amount: '350000',
-    point_type: 'standard',
-  },
-  {
-    id: '10',
-    date: '2024-11-05T17:28:11.490Z',
-    transaction_id: 'TXN123465',
-    melon_id: 'MEL123465',
-    amount: '400000',
-    point_type: 'offer',
-  },
-];
-
 export const Transactions = () => {
-  const [data, setData] = useState<TransactionT[]>(transactions);
+  const {data: transactions} = useFetchActivities();
+
   const [date, setDate] = useState<DateRange | undefined>(undefined);
-  const [amount, setAmount] = useState('');
-  const [pointType, setPointType] = useState<PointTypeT | ''>('');
+  // const [amount, setAmount] = useState('');
+  // const [pointType, setPointType] = useState<PointTypeT | ''>('');
 
   const columns: ColumnDef<TransactionT>[] = [
     {
@@ -181,7 +99,7 @@ export const Transactions = () => {
   ];
 
   const table = useReactTable({
-    data: data,
+    data: transactions?.data?.results ?? [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -191,21 +109,17 @@ export const Transactions = () => {
 
   const clearFilters = () => {
     setDate(undefined);
-    setAmount('');
-    setPointType('');
+    // setAmount('');
+    // setPointType('');
   };
 
-  useEffect(() => {
-    setData(transactions);
-  }, []);
-
   return (
-    <DashboardLayout pageTitle={<PageTitle />}>
+    <DashboardLayout pageTitle={'Activities'}>
       <div className="w-full min-h-full px-7 py-9 bg-[#F5F6F8]">
         <div className="p-6 rounded-[20px] bg-white">
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-semibold text-pashBlack-1">
-              All Transactions
+              All Activities
             </h1>
             <Button>Download Report</Button>
           </div>
@@ -250,7 +164,7 @@ export const Transactions = () => {
                 </PopoverContent>
               </Popover>
 
-              <Select value={amount} onValueChange={setAmount}>
+              {/* <Select value={amount} onValueChange={setAmount}>
                 <SelectTrigger className="min-w-[110px] w-fit">
                   <SelectValue placeholder="Amount" />
                 </SelectTrigger>
@@ -277,9 +191,8 @@ export const Transactions = () => {
                 <SelectContent>
                   <SelectItem value="standard">Standard</SelectItem>
                   <SelectItem value="offer">Offer</SelectItem>
-                  <SelectItem value="referal">Referral</SelectItem>
                 </SelectContent>
-              </Select>
+              </Select> */}
             </div>
 
             <Button variant={'secondary'} onClick={clearFilters}>
@@ -359,28 +272,17 @@ export const Transactions = () => {
             </Table>
           </div>
 
-          <div className="mt-8">
-            <Pagination
-              totalPages={10}
-              currentPage={1}
-              onPageChange={() => {}}
-            />
-          </div>
+          {transactions?.data?.results?.length > 0 && (
+            <div className="mt-8">
+              <Pagination
+                totalPages={10}
+                currentPage={1}
+                onPageChange={() => {}}
+              />
+            </div>
+          )}
         </div>
       </div>
     </DashboardLayout>
-  );
-};
-
-const PageTitle = () => {
-  const navigate = useNavigate();
-
-  return (
-    <>
-      <button onClick={() => navigate(-1)}>
-        <ArrowLeft className="w-5 h-5" />
-      </button>
-      <span>Transactions</span>
-    </>
   );
 };

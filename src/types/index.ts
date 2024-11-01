@@ -22,9 +22,10 @@ export type CreateAccountT = {
 export type TransactionT = {
   id: string;
   amount: string;
-  point_type: 'standard';
+  point_type: PointTypeT;
   created_at: string;
   receipt_id: string;
+  melon_id: string | null;
   count: string;
   items: ItemT[];
 };
@@ -78,36 +79,75 @@ export type ApiResponseT = {
   data: any;
 };
 
-export type UpdateBusinessT = {
-  account: UpdateBusinessDetailsT | null;
-  directors: UpdateDirectorDetailsT[];
-  personal_detail: UpdatePersonalDetailsT | null;
-};
-
-export type UpdatePersonalDetailsT = {
-  first_name: string;
-  last_name: string;
-  phone_number: string;
-  email: string;
+export type BusinessT = {
+  id: string;
+  profile_completed: boolean;
+  type: 'registered' | 'unregistered';
+  details?: {
+    logo: string | null;
+    rc_number?: string | null;
+    name: string | null;
+    business_email: string | null;
+    phone_number: string | null;
+    industry: string | null;
+    channel: string | null;
+    website_link: string | null;
+    country: string | null;
+    state: string | null;
+    city: string | null;
+    street: string | null;
+  };
+  socials?: {
+    instagram: string | null;
+    facebook: string | null;
+    twitter: string | null;
+    linkedIn: string | null;
+  };
+  directors?: {
+    first_name: string | null;
+    last_name: string | null;
+    email: string | null;
+    phone_number: string | null;
+    address: string | null;
+  };
+  personal_details?: {
+    first_name: string | null;
+    last_name: string | null;
+    email: string | null;
+    phone_number: string | null;
+    country: string | null;
+    state: string | null;
+    city: string | null;
+    street: string | null;
+  };
 };
 
 export type UpdateBusinessDetailsT = {
-  logo: string | null;
-  state: string;
-  channel: string;
-  address: string;
-  country: string;
-  facebook: string | null;
-  industry: string;
-  instagram: string | null;
-  rc_number: string;
-  website_link: string | null;
-  phone_number: string;
-  name: string;
-  online_channel: string[];
+  details: {
+    logo: string | null;
+    rc_number?: string | null;
+    name: string | null;
+    phone_number: string | null;
+    industry: string | null;
+    channel: string | null;
+    website_link?: string | null;
+    country: string | null;
+    state: string | null;
+    city: string | null;
+    street: string | null;
+    type: 'registered' | 'unregistered';
+  };
+  business_id: string;
 };
 
-export type UpdateDirectorDetailsT = {
+export type UpdateSocialsT = {
+  instagram?: string | null;
+  facebook?: string | null;
+  twitter?: string | null;
+  linkedIn?: string | null;
+};
+
+export type UpdateDirectorT = {
   first_name: string;
   last_name: string;
   phone_number: string;
@@ -115,26 +155,18 @@ export type UpdateDirectorDetailsT = {
   address: string;
 };
 
-export type BusinessT = {
-  id: string;
-  name: string;
-  country: string | null;
-  business_email: string;
-  phone_number: string;
-  rc_number: string | null;
-  industry: string | null;
-  channel: string | null;
-  online_channel: string[];
-  website_link: string | null;
-  instagram: string | null;
-  facebook: string | null;
-  address: string | null;
-  type: string | null;
-  state: string | null;
-  logo: string | null;
-  profile_completed: boolean;
-  director_phone_verified: boolean;
-  add_terms_cond: boolean;
+export type UpdatePersonalDetailsT = {
+  details: {
+    first_name: string;
+    last_name: string;
+    phone_number: string;
+    email: string;
+    state: string;
+    country: string;
+    city: string;
+    street: string;
+  };
+  member_id: string;
 };
 
 export type TotalPatronageT = {
@@ -163,4 +195,10 @@ export type ReceiptItemT = {
   quantity: number;
 };
 
-export type PointTypeT = 'standard' | 'offer' | 'referral';
+export type PointTypeT = 'standard' | 'offer';
+
+export type RegistrationStageT =
+  | 'identity_verification'
+  | 'business_details'
+  | 'business_socials'
+  | 'directors_details';

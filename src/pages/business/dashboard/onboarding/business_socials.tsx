@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
@@ -12,12 +13,21 @@ import {
 } from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {ScrollArea} from '@/components/ui/scroll-area';
-import {SectionValueT} from './unregistered-business';
 import {useNavigate} from 'react-router-dom';
 import {ROUTES} from '@/router/routes';
+import {RegistrationStageT, UpdateSocialsT} from '@/types';
+import {useMutation, useQueryClient} from '@tanstack/react-query';
+import {toast} from 'react-toastify';
+import businessServices from '@/services/business';
+import {useEffect} from 'react';
+import {useAuth} from '@/store/useAuth';
+import {useFetchBusiness} from '@/hooks/useQueries';
+import {Loader2} from 'lucide-react';
 
 type Props = {
-  setCurrentSection: React.Dispatch<React.SetStateAction<SectionValueT>>;
+  setCurrentSection: React.Dispatch<React.SetStateAction<RegistrationStageT>>;
+  setCompleted: React.Dispatch<React.SetStateAction<RegistrationStageT[]>>;
+  completed: RegistrationStageT[];
   business_type: 'registered' | 'unregistered';
 };
 
@@ -28,7 +38,19 @@ const formSchema = z.object({
   linkedIn: z.string().optional(),
 });
 
-export const BusinessSocials = ({setCurrentSection, business_type}: Props) => {
+export const BusinessSocials = ({
+  setCurrentSection,
+  setCompleted,
+  completed,
+  business_type,
+}: Props) => {
+  const queryClient = useQueryClient();
+
+  const {user} = useAuth();
+  const {data: business} = useFetchBusiness({
+    businessId: user?.business_id as string,
+  });
+
   const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -47,14 +69,59 @@ export const BusinessSocials = ({setCurrentSection, business_type}: Props) => {
     !!form.watch('twitter') ||
     !!form.watch('linkedIn');
 
+  const {mutate, status} = useMutation({
+    mutationFn: businessServices.updateSocials,
+    onSuccess: () => {
+      if (business_type === 'registered') {
+        setCurrentSection('directors_details');
+      } else {
+        navigate(ROUTES.registrationSuccess);
+      }
+      queryClient.invalidateQueries({
+        queryKey: ['business'],
+      });
+    },
+    onError: (error: any) => {
+      toast.error(
+        error.response?.data?.message || 'Error updating business socials',
+      );
+    },
+  });
+
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log({values});
-    if (business_type === 'registered') {
-      setCurrentSection('directors_details');
-    } else {
-      navigate(ROUTES.registrationSuccess);
-    }
+    const payload: UpdateSocialsT = {
+      ...(values.instagram && {instagram: values.instagram}),
+      ...(values.facebook && {facebook: values.facebook}),
+      ...(values.twitter && {twitter: values.twitter}),
+      ...(values.linkedIn && {linkedIn: values.linkedIn}),
+    };
+
+    mutate(payload);
   }
+
+  useEffect(() => {
+    if (business && business.data && business.data.socials) {
+      form.reset({
+        instagram: business.data.socials.instagram ?? '',
+        facebook: business.data.socials.facebook ?? '',
+        twitter: business.data.socials.twitter ?? '',
+        linkedIn: business.data.socials.linkedIn ?? '',
+      });
+    }
+  }, [business, form]);
+
+  useEffect(() => {
+    if (business && business.data && business.data.socials) {
+      if (
+        !!business.data.socials.instagram ||
+        !!business.data.socials.facebook ||
+        !!business.data.socials.twitter ||
+        !!business.data.socials.industry
+      ) {
+        setCompleted([...completed, 'business_socials']);
+      }
+    }
+  }, [business, completed, setCompleted]);
 
   return (
     <Form {...form}>
@@ -149,9 +216,13 @@ export const BusinessSocials = ({setCurrentSection, business_type}: Props) => {
             type="submit"
             size={'lg'}
             className="w-full"
-            disabled={!isBtnActive}
+            disabled={!isBtnActive || status === 'pending'}
           >
-            Continue
+            {status === 'pending' ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              'Continue'
+            )}
           </Button>
         </div>
       </form>

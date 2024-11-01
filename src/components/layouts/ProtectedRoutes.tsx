@@ -12,7 +12,7 @@ const ProtectedRoutes = () => {
 
   useEffect(() => {
     if (!token || !user) {
-      navigate(ROUTES.businessSignIn);
+      navigate(ROUTES.login);
     }
   }, [token, navigate, user]);
 

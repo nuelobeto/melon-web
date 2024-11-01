@@ -1,10 +1,16 @@
 import {ROUTES} from '@/router/routes';
+import {BarChartIcon} from 'lucide-react';
 
 export const navlinks = [
   {
     label: 'Home',
     url: ROUTES.home,
     icon: <img src="/images/home.svg" alt="" width={20} height={20} />,
+  },
+  {
+    label: 'Activities',
+    url: ROUTES.transactions,
+    icon: <BarChartIcon className="text-white stroke-[1px]" />,
   },
   {
     label: 'Settings',

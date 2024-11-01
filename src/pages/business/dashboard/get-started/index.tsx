@@ -12,7 +12,7 @@ export const GetStarted = () => {
         <div className="w-full max-w-[874px] mx-auto bg-white py-5 sm:py-10 px-5 sm:px-14 rounded-[22px]">
           <div>
             <h1 className="font-semibold text-2xl sm:text-[32px] text-pashBlack-1">
-              Welcome to Melon Jane Doe
+              Welcome to Melon
             </h1>
             <p className="mt-2 text-pashBlack-6">
               Complete this steps to fully get started

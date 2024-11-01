@@ -3,8 +3,10 @@ import {Button} from '@/components/ui/button';
 import {RecentTransactions} from './recent-transactions';
 import {useNavigate} from 'react-router-dom';
 import {ROUTES} from '@/router/routes';
+import {useFetchOverview} from '@/hooks/useQueries';
 
 export const Home = () => {
+  const {data: overview} = useFetchOverview();
   const navigate = useNavigate();
 
   return (
@@ -26,7 +28,7 @@ export const Home = () => {
                 className="w-1/2 rounded-lg"
                 onClick={() => navigate(ROUTES.sendReward)}
               >
-                Send Reward
+                Activate Reward Points
               </Button>
               <Button variant={'secondary'} className="w-1/2 rounded-lg">
                 Create Storefront
@@ -66,7 +68,7 @@ export const Home = () => {
                 Total number of customers
               </p>
               <p className="text-pashBlack-1 mt-3 text-3xl font-semibold">
-                200
+                {overview?.data[0]?.total_customer ?? 0}
               </p>
             </div>
             <div className="py-5 px-3 rounded-[10px] bg-mountainAsh-10">
@@ -77,7 +79,7 @@ export const Home = () => {
                 Total number of customers
               </p>
               <p className="text-pashBlack-1 mt-3 text-3xl font-semibold">
-                200
+                {overview?.data[0]?.total_transaction ?? 0}
               </p>
             </div>
             <div className="py-5 px-3 rounded-[10px] bg-mountainAsh-10">
@@ -88,7 +90,7 @@ export const Home = () => {
                 Total number of customers
               </p>
               <p className="text-pashBlack-1 mt-3 text-3xl font-semibold">
-                200
+                {overview?.data[0]?.sum ?? 0}
               </p>
             </div>
           </div>
@@ -97,7 +99,7 @@ export const Home = () => {
         <div className="p-6 rounded-xl bg-white mt-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-semibold text-pashBlack-1">
-              Recent Transactions
+              Recent Activities
             </h2>
             <button
               className="text-pashBlack-3 underline"

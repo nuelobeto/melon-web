@@ -1,4 +1,3 @@
-import {Button} from '@/components/ui/button';
 import {ScrollArea} from '@/components/ui/scroll-area';
 import {QRCodeSVG} from 'qrcode.react';
 import {useEffect, useState} from 'react';
@@ -16,7 +15,7 @@ export const QrCode = () => {
 
   return (
     <div className="w-full h-[calc(100%-102px-24px)] bg-white rounded-3xl mt-6">
-      <ScrollArea className="w-full h-[calc(100%-85px)]">
+      <ScrollArea className="w-full h-full">
         <div className="py-10 px-11">
           <div className="space-y-1">
             <h1 className="text-3xl font-medium text-pashBlack-1">
@@ -39,17 +38,6 @@ export const QrCode = () => {
           </div>
         </div>
       </ScrollArea>
-
-      <div className="py-5 px-11 border-t border-mountainAsh-6">
-        <Button
-          type="submit"
-          size={'lg'}
-          className="w-full"
-          onClick={generateQrCode}
-        >
-          Generate
-        </Button>
-      </div>
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import {Sidebar} from './sidebar';
 import {Main} from './main';
 
-export const CreateBusinessAccount = () => {
+export const CreateAccount = () => {
   return (
     <div className="w-screen h-screen flex">
       <Sidebar />

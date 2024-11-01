@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {emailSchema, phoneNumberSchema} from '@/helpers/zod-schema';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
 import {Button} from '@/components/ui/button';
@@ -14,31 +15,23 @@ import {
 } from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {ScrollArea} from '@/components/ui/scroll-area';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {cn} from '@/lib/utils';
-import {CountryCodeType} from '@/types';
+import {CountryCodeType, UpdatePersonalDetailsT} from '@/types';
 import {CountryCode} from '@/components/ui/country-code';
 import {useNavigate} from 'react-router-dom';
 import {ROUTES} from '@/router/routes';
-
-const means_of_id = [
-  "Driver's License",
-  'National Identity Number',
-  `Voter's Card`,
-];
+import {useMutation, useQueryClient} from '@tanstack/react-query';
+import {useFetchBusiness} from '@/hooks/useQueries';
+import {useAuth} from '@/store/useAuth';
+import businessServices from '@/services/business';
+import {toast} from 'react-toastify';
+import {Loader2} from 'lucide-react';
 
 const formSchema = z.object({
-  means_of_id: z.string().min(1, {
-    message: 'Select means of identification',
+  first_name: z.string().min(1, {
+    message: 'Enter first name',
   }),
-  full_name: z.string().min(1, {
-    message: 'Enter full name',
+  last_name: z.string().min(1, {
+    message: 'Enter last name',
   }),
   email: emailSchema('Enter email address'),
   phone_number: phoneNumberSchema('Enter phone number'),
@@ -57,26 +50,23 @@ const formSchema = z.object({
 });
 
 export const IdentityVerification = () => {
-  const [image, setImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+
+  const {user} = useAuth();
+  const {data: business} = useFetchBusiness({
+    businessId: user?.business_id as string,
+  });
+
   const [selectedCountryCode, setSelectedCountryCode] =
     useState<CountryCodeType | null>(null);
 
   const navigate = useNavigate();
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file && file.type.startsWith('image/')) {
-      setImage(file);
-      setImagePreview(URL.createObjectURL(file)); // Create a preview URL
-    }
-  };
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      means_of_id: '',
-      full_name: '',
+      first_name: '',
+      last_name: '',
       email: '',
       phone_number: '',
       country: '',
@@ -86,9 +76,29 @@ export const IdentityVerification = () => {
     },
   });
 
+  const {mutate, status} = useMutation({
+    mutationFn: businessServices.updatePersonalDetails,
+    onSuccess: () => {
+      navigate(
+        ROUTES.verifyOwnerPhone.replace(
+          ':phone',
+          `${selectedCountryCode?.callingCode}${form.getValues(
+            'phone_number',
+          )}`,
+        ),
+      );
+      queryClient.invalidateQueries({
+        queryKey: ['business'],
+      });
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message);
+    },
+  });
+
   const isBtnActive =
-    !!form.watch('means_of_id') &&
-    !!form.watch('full_name') &&
+    !!form.watch('first_name') &&
+    !!form.watch('last_name') &&
     !!form.watch('email') &&
     !!form.watch('phone_number') &&
     !!form.watch('country') &&
@@ -97,9 +107,45 @@ export const IdentityVerification = () => {
     !!form.watch('street');
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log({values}, {image});
-    navigate(ROUTES.verifyOwnerPhone);
+    if (!user) {
+      return;
+    }
+
+    const payload: UpdatePersonalDetailsT = {
+      details: {
+        first_name: values.first_name,
+        last_name: values.last_name,
+        phone_number: `+${
+          selectedCountryCode?.callingCode
+        }${values.phone_number.slice(1)}`,
+        email: values.email,
+        state: values.state,
+        country: values.country,
+        city: values.city,
+        street: values.street,
+      },
+      member_id: user.member_id,
+    };
+
+    mutate(payload);
   }
+
+  useEffect(() => {
+    if (business && business.data && business.data.personal_details) {
+      form.reset({
+        first_name: business.data.personal_details.first_name ?? '',
+        last_name: business.data.personal_details.last_name ?? '',
+        email: business.data.personal_details.email ?? '',
+        phone_number: business.data.personal_details.phone_number
+          ? business.data.personal_details.phone_number.replace(/^(\+234)/, '0')
+          : '',
+        country: business.data.personal_details.country ?? '',
+        state: business.data.personal_details.state ?? '',
+        city: business.data.personal_details.city ?? '',
+        street: business.data.personal_details.street ?? '',
+      });
+    }
+  }, [business, form]);
 
   return (
     <Form {...form}>
@@ -119,120 +165,30 @@ export const IdentityVerification = () => {
             <div className="mt-6 space-y-6">
               <FormField
                 control={form.control}
-                name="means_of_id"
+                name="first_name"
                 render={({field}) => (
                   <FormItem>
-                    <FormLabel>Means of Identification</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger
-                          className={cn(
-                            'h-12',
-                            !field.value && 'text-pashBlack-6',
-                          )}
-                        >
-                          <SelectValue placeholder="Select means of Identification" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {means_of_id.map((item, index) => (
-                          <SelectItem key={index} value={item}>
-                            {item}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormLabel>First Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter first name"
+                        {...field}
+                        className="h-12"
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
-              <div className="w-full p-5 border border-dashed border-mountainAsh-1 bg-mountainAsh-10 rounded-md flex flex-col items-center">
-                {imagePreview ? (
-                  <div className="w-[100px] h-[100px] rounded-full border border-mountainAsh-1 bg-mountainAsh-8">
-                    <img
-                      src={imagePreview}
-                      className="w-full h-full object-cover rounded-full"
-                    />
-                  </div>
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-mountainAsh-7 flex items-center justify-center">
-                    <img
-                      src="/images/cloud-plus.svg"
-                      alt=""
-                      width={24}
-                      height={24}
-                    />
-                  </div>
-                )}
-
-                {imagePreview ? (
-                  <div className="w-full flex items-center justify-center gap-3 mt-3">
-                    <div className="">
-                      <label
-                        htmlFor="file"
-                        className="block text-sm text-pink-1 font-semibold text-center cursor-pointer h-10 px-4 py-2 rounded-lg border border-mountainAsh-1 bg-gradient-to-b from-[#F5F6F8] to-[#d2d9e99e]"
-                      >
-                        Change ID
-                      </label>
-                      <input
-                        type="file"
-                        id="file"
-                        onChange={handleFileChange}
-                        className="hidden"
-                      />
-                    </div>
-                    <button
-                      className="text-sm text-pashBlack-1 font-semibold text-center cursor-pointer h-10 px-4 py-2 rounded-lg border border-mountainAsh-1 bg-gradient-to-b from-[#F5F6F8] to-[#d2d9e99e]"
-                      onClick={() => {
-                        setImage(null);
-                        setImagePreview(null);
-                      }}
-                    >
-                      Remove ID
-                    </button>
-                  </div>
-                ) : (
-                  <div className="w-full mt-1.5 flex flex-col items-center">
-                    <p className="text-center text-xs text-[#334155]">
-                      Upload ID
-                    </p>
-                    <div className="flex items-center justify-center gap-1 mt-1">
-                      <label
-                        htmlFor="file"
-                        className="text-sm text-pink-1 font-semibold text-center cursor-pointer"
-                      >
-                        Click to upload
-                      </label>
-                      <p className="text-sm text-pashBlack-4 text-center font-normal">
-                        or drag and drop
-                      </p>
-                    </div>
-                    <input
-                      type="file"
-                      id="file"
-                      onChange={handleFileChange}
-                      className="hidden"
-                    />
-                    <p className="text-xs text-pashBlack-7 mt-[2px]">
-                      SVG, PNG, JPG (max. 800x400px)
-                    </p>
-                  </div>
-                )}
-              </div>
-
               <FormField
                 control={form.control}
-                name="full_name"
+                name="last_name"
                 render={({field}) => (
                   <FormItem>
-                    <FormLabel>Full Name</FormLabel>
+                    <FormLabel>Last Name</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Enter full name"
+                        placeholder="Enter last name"
                         {...field}
                         className="h-12"
                       />
@@ -369,9 +325,13 @@ export const IdentityVerification = () => {
             type="submit"
             size={'lg'}
             className="w-full"
-            disabled={!isBtnActive}
+            disabled={!isBtnActive || status === 'pending'}
           >
-            Continue
+            {status === 'pending' ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              'Continue'
+            )}
           </Button>
         </div>
       </form>

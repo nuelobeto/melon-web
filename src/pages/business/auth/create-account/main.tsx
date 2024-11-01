@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {CountryCode} from '@/components/ui/country-code';
-import {ApiResponseT, CountryCodeType, CreateBusinessT} from '@/types';
+import {CountryCodeType, CreateBusinessT} from '@/types';
 import {useState} from 'react';
 import {Checkbox} from '@/components/ui/checkbox';
 import {Link, useNavigate} from 'react-router-dom';
@@ -30,6 +30,7 @@ import {
   stringSchema,
 } from '@/helpers/zod-schema';
 import {LogoWhite} from '@/components/ui/logo';
+import {useMutation} from '@tanstack/react-query';
 
 const formSchema = z
   .object({
@@ -43,7 +44,7 @@ const formSchema = z
     }),
   })
   .refine(data => data.password === data.confirm_password, {
-    path: ['confirm_password'], // This indicates the field to show the error on
+    path: ['confirm_password'],
     message: 'Passwords must match',
   });
 
@@ -51,7 +52,6 @@ export const Main = () => {
   const [selectedCountryCode, setSelectedCountryCode] =
     useState<CountryCodeType | null>(null);
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -63,10 +63,19 @@ export const Main = () => {
       confirm_password: '',
       agree_to_terms: true,
     },
-    mode: 'onBlur',
   });
 
   const emailValue = form.getValues('business_email');
+
+  const {mutate, status} = useMutation({
+    mutationFn: authServices.createBusinessAccount,
+    onSuccess: () => {
+      navigate(ROUTES.verifyEmail.replace(':email', emailValue));
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message ?? 'Error creating business');
+    },
+  });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const payload: CreateBusinessT = {
@@ -79,19 +88,7 @@ export const Main = () => {
       add_terms_cond: values.agree_to_terms,
     };
 
-    setLoading(true);
-    try {
-      const res: ApiResponseT = await authServices.createBusinessAccount(
-        payload,
-      );
-      if (res.status === 'success') {
-        setLoading(false);
-        navigate(ROUTES.verifyBusinessAccount.replace(':email', emailValue));
-      }
-    } catch (error: any) {
-      setLoading(false);
-      toast.error(error.response?.data?.message ?? 'Error creating business');
-    }
+    mutate(payload);
   }
 
   return (
@@ -243,9 +240,9 @@ export const Main = () => {
                 <Button
                   type="submit"
                   className="h-12 w-full"
-                  disabled={loading}
+                  disabled={status === 'pending'}
                 >
-                  {loading ? (
+                  {status === 'pending' ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
                     'Create account'
@@ -253,7 +250,7 @@ export const Main = () => {
                 </Button>
                 <p className="font-medium text-sm text-pashBlack-4 text-center">
                   Have an account?{' '}
-                  <Link to={ROUTES.businessSignIn} className="text-pashBlack-1">
+                  <Link to={ROUTES.login} className="text-pashBlack-1">
                     Sign In
                   </Link>
                 </p>

@@ -17,24 +17,25 @@ import {Input} from '@/components/ui/input';
 import {Link, useNavigate} from 'react-router-dom';
 import {ROUTES} from '@/router/routes';
 import {Eye, EyeOff, Loader2} from 'lucide-react';
-import {ApiResponseT, LoginT} from '@/types';
+import {LoginT} from '@/types';
 import {useEffect, useState} from 'react';
 import authServices from '@/services/auth';
 import {useAuth} from '@/store/useAuth';
-import {useFetchBusiness} from '@/hooks/business';
-import {useBusiness} from '@/store/useBusiness';
 import {emailSchema, passwordSchema} from '@/helpers/zod-schema';
+import {useMutation} from '@tanstack/react-query';
+import {toast} from 'react-toastify';
+import {useFetchBusiness} from '@/hooks/useQueries';
 
 const formSchema = z.object({
   business_email: emailSchema('Please enter your business email.'),
   password: passwordSchema(),
 });
 
-export const BusinessSignIn = () => {
-  const {setUser} = useAuth();
-  const {business} = useBusiness();
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+export const Login = () => {
+  const {user, setUser} = useAuth();
+  const {data: business} = useFetchBusiness({
+    businessId: user?.business_id as string,
+  });
   const [showPassword, setShowpassword] = useState(false);
 
   const navigate = useNavigate();
@@ -47,39 +48,34 @@ export const BusinessSignIn = () => {
     },
   });
 
+  const {mutate, status} = useMutation({
+    mutationFn: authServices.login,
+    onSuccess: data => {
+      setUser(data.data.member);
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message);
+    },
+  });
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const payload: LoginT = {
       email: values.business_email,
       password: values.password,
     };
 
-    setLoading(true);
-    try {
-      const res: ApiResponseT = await authServices.login(payload);
-
-      if (res.status === 'success') {
-        setLoading(false);
-        setSuccess(true);
-        setUser(res.data.member);
-      }
-    } catch (error: any) {
-      setLoading(false);
-    }
+    mutate(payload);
   }
 
   useEffect(() => {
-    if (!success || !business) return;
+    if (status !== 'success' || !business) return;
 
-    setSuccess(false);
-
-    if (!business.profile_completed) {
+    if (!business.data.profile_completed) {
       navigate(ROUTES.getStarted);
     } else {
       navigate(ROUTES.home);
     }
-  }, [business, navigate, success]);
-
-  useFetchBusiness();
+  }, [business, navigate, status]);
 
   return (
     <main className="w-screen h-screen bg-[#081623] bg-[url('/images/auth-bg.svg')] bg-no-repeat bg-cover">
@@ -166,9 +162,9 @@ export const BusinessSignIn = () => {
                 <Button
                   type="submit"
                   className="h-12 w-full"
-                  disabled={loading}
+                  disabled={status === 'pending'}
                 >
-                  {loading ? (
+                  {status === 'pending' ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
                     'Log In'
@@ -176,10 +172,7 @@ export const BusinessSignIn = () => {
                 </Button>
                 <p className="font-medium text-sm text-pashBlack-4 text-center">
                   New to Melon?{' '}
-                  <Link
-                    to={ROUTES.createBusinessAccount}
-                    className="text-pashBlack-1"
-                  >
+                  <Link to={ROUTES.createAccount} className="text-pashBlack-1">
                     Create an account
                   </Link>
                 </p>

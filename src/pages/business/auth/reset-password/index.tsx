@@ -17,11 +17,11 @@ import {Input} from '@/components/ui/input';
 import {Link, useNavigate, useParams} from 'react-router-dom';
 import {ROUTES} from '@/router/routes';
 import {Loader2} from 'lucide-react';
-import {ApiResponseT, ResetPasswordT} from '@/types';
-import {useState} from 'react';
+import {ResetPasswordT} from '@/types';
 import authServices from '@/services/auth';
 import {passwordSchema} from '@/helpers/zod-schema';
 import {toast} from 'react-toastify';
+import {useMutation} from '@tanstack/react-query';
 
 const formSchema = z
   .object({
@@ -34,8 +34,6 @@ const formSchema = z
   });
 
 export const ResetPassword = () => {
-  const [loading, setLoading] = useState(false);
-
   const navigate = useNavigate();
   const params = useParams();
   const token = params.token;
@@ -46,7 +44,17 @@ export const ResetPassword = () => {
       password1: '',
       password2: '',
     },
-    mode: 'onBlur',
+  });
+
+  const {mutate, status} = useMutation({
+    mutationFn: authServices.resetPassword,
+    onSuccess: data => {
+      toast.success(data.message);
+      navigate(ROUTES.login);
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message);
+    },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -59,19 +67,7 @@ export const ResetPassword = () => {
       password: values.password1,
     };
 
-    setLoading(true);
-    try {
-      const res: ApiResponseT = await authServices.resetPassword(payload);
-
-      if (res.status === 'success') {
-        setLoading(false);
-        toast.success(res.message);
-        navigate(ROUTES.businessSignIn);
-      }
-    } catch (error: any) {
-      setLoading(false);
-      toast.success(error.response.data.message);
-    }
+    mutate(payload);
   }
 
   return (
@@ -137,9 +133,9 @@ export const ResetPassword = () => {
                 <Button
                   type="submit"
                   className="h-12 w-full"
-                  disabled={loading}
+                  disabled={status === 'pending'}
                 >
-                  {loading ? (
+                  {status === 'pending' ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
                     'Reset password'
@@ -147,7 +143,7 @@ export const ResetPassword = () => {
                 </Button>
                 <p className="font-medium text-sm text-pashBlack-4 text-center">
                   Remember your password?{' '}
-                  <Link to={ROUTES.businessSignIn} className="text-pashBlack-1">
+                  <Link to={ROUTES.login} className="text-pashBlack-1">
                     Sign in
                   </Link>
                 </p>

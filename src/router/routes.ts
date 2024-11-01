@@ -7,12 +7,12 @@ export const ROUTES = {
   downloadApp: '/get-the-app',
 
   // business auth
-  createBusinessAccount: '/auth/business/create-account',
-  verifyBusinessAccount: '/auth/business/verify-email/:email',
-  businessAccountVerified: '/business/email-verified/:token',
-  businessSignIn: '/auth/business/sign-in',
-  forgotBusinessPassword: '/auth/business/forgot-password',
-  forgotPasswordSuccess: '/auth/business/forgot-password/:email',
+  createAccount: '/auth/create-account',
+  verifyEmail: '/auth/verify-email/:email',
+  accountVerified: '/business/email-verified/:token',
+  login: '/auth/login',
+  forgotBusinessPassword: '/auth/forgot-password',
+  forgotPasswordSuccess: '/auth/forgot-password/:email',
   resetPassword: '/business/forget-password/:token',
 
   // business onboarding

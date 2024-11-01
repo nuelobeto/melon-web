@@ -2,34 +2,31 @@
 import {LogoWhite} from '@/components/ui/logo';
 import {ScrollArea} from '@/components/ui/scroll-area';
 import authServices from '@/services/auth';
-import {ApiResponseT} from '@/types';
-import {useState} from 'react';
+import {useMutation} from '@tanstack/react-query';
+import {Loader2} from 'lucide-react';
 import {useParams} from 'react-router-dom';
 import {toast} from 'react-toastify';
 
-export const VerifyBusinessAccount = () => {
+export const VerifyEmail = () => {
   const params = useParams();
   const email = params.email;
-  const [loading, setLoading] = useState(false);
+
+  const {mutate, status} = useMutation({
+    mutationFn: authServices.resendBusinessEmailOtp,
+    onSuccess: data => {
+      toast.success(data.message);
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message);
+    },
+  });
 
   const handleResendEmail = async () => {
     if (!email) {
       return;
     }
 
-    setLoading(true);
-    try {
-      const res: ApiResponseT = await authServices.resendBusinessEmailOtp(
-        email,
-      );
-      if (res.status === 'success') {
-        setLoading(false);
-        toast.success(res.message);
-      }
-    } catch (error: any) {
-      setLoading(false);
-      toast.error(error.response?.data?.message ?? 'Error sending link');
-    }
+    mutate(email);
   };
 
   return (
@@ -55,9 +52,13 @@ export const VerifyBusinessAccount = () => {
               <button
                 className="text-pink-1"
                 onClick={handleResendEmail}
-                disabled={loading}
+                disabled={status === 'pending'}
               >
-                Resend
+                {status === 'pending' ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  'Resend'
+                )}
               </button>
             </div>
           </div>

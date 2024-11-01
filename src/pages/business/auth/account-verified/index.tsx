@@ -4,27 +4,24 @@ import {LogoWhite} from '@/components/ui/logo';
 import {ScrollArea} from '@/components/ui/scroll-area';
 import {ROUTES} from '@/router/routes';
 import authServices from '@/services/auth';
+import {useMutation} from '@tanstack/react-query';
 import {useEffect} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 
-export const BusinessAccountVerified = () => {
+export const AccountVerified = () => {
   const navigate = useNavigate();
   const params = useParams();
   const token = params.token;
 
-  const verifyEmail = async (token: string) => {
-    try {
-      await authServices.verifyBusinessEmail(token);
-    } catch (error: any) {
-      console.log(error);
-    }
-  };
+  const {mutate} = useMutation({
+    mutationFn: authServices.verifyBusinessEmail,
+  });
 
   useEffect(() => {
     if (token) {
-      verifyEmail(token);
+      mutate(token);
     }
-  }, [token]);
+  }, [mutate, token]);
 
   return (
     <main className="w-screen h-screen bg-[#081623] bg-[url('/images/auth-bg.svg')] bg-no-repeat bg-cover">
@@ -56,7 +53,7 @@ export const BusinessAccountVerified = () => {
             <Button
               type="submit"
               className="h-12 w-full"
-              onClick={() => navigate(ROUTES.businessSignIn)}
+              onClick={() => navigate(ROUTES.login)}
             >
               Log In
             </Button>

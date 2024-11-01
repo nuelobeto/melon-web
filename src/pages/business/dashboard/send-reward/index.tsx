@@ -6,7 +6,7 @@ import {useNavigate} from 'react-router-dom';
 import {QrCode} from './qr-code';
 import {Manual} from './manual';
 
-type TabValue = 'qr_code' | 'manual';
+type TabValue = 'qr_code' | 'enter_details';
 
 type Tab = {
   label: string;
@@ -15,12 +15,12 @@ type Tab = {
 
 const tabs: Tab[] = [
   {
-    label: 'Generate QR Code',
+    label: 'QR Code',
     value: 'qr_code',
   },
   {
-    label: 'Generate Manually',
-    value: 'manual',
+    label: 'Enter Details',
+    value: 'enter_details',
   },
 ];
 
@@ -49,7 +49,7 @@ export const SendReward = () => {
           </div>
 
           {currentTab === 'qr_code' && <QrCode />}
-          {currentTab === 'manual' && <Manual />}
+          {currentTab === 'enter_details' && <Manual />}
         </div>
       </div>
     </DashboardLayout>
@@ -64,7 +64,7 @@ const PageTitle = () => {
       <button onClick={() => navigate(-1)}>
         <ArrowLeft className="w-5 h-5" />
       </button>
-      <span>Send Reward</span>
+      <span>Activate Reward Points</span>
     </>
   );
 };

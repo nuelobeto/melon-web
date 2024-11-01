@@ -10,19 +10,18 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import {navlinks} from '@/constants/navlinks';
-import {useFetchPersonalDetails} from '@/hooks/business';
+import {useFetchBusiness} from '@/hooks/useQueries';
 import {cn} from '@/lib/utils';
 import {useAuth} from '@/store/useAuth';
-import {useBusiness} from '@/store/useBusiness';
 import {X, LogOut} from 'lucide-react';
 import React from 'react';
 import {NavLink} from 'react-router-dom';
 
 export const MobileSidebar = ({children}: {children: React.ReactNode}) => {
-  const {logout} = useAuth();
-  const {business, personalDetails} = useBusiness();
-
-  useFetchPersonalDetails();
+  const {user, logout} = useAuth();
+  const {data: business} = useFetchBusiness({
+    businessId: user?.business_id as string,
+  });
 
   return (
     <Sheet>
@@ -34,17 +33,17 @@ export const MobileSidebar = ({children}: {children: React.ReactNode}) => {
         <SheetHeader className="w-full h-16 flex flex-row items-center justify-between px-5 space-y-0 ">
           <div className="flex items-center gap-2">
             <Avatar className="w-8 h-8">
-              <AvatarImage src={business?.logo ?? undefined} />
+              <AvatarImage src={business?.data?.details?.logo ?? undefined} />
               <AvatarFallback className="text-pashBlack-1">
-                {business?.name.charAt(0)}
+                {business?.data?.details?.name?.charAt(0)}
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
               <SheetTitle className="font-medium text-base text-white">
-                {business?.name}
+                {business?.data?.details?.name}
               </SheetTitle>
-              <SheetDescription className="text-xs text-mountainAsh-1 text-left">
-                {personalDetails?.first_name} {personalDetails?.last_name}
+              <SheetDescription className="text-xs text-mountainAsh-1 text-left hidden">
+                {/* {personalDetails?.first_name} {personalDetails?.last_name} */}
               </SheetDescription>
             </div>
           </div>

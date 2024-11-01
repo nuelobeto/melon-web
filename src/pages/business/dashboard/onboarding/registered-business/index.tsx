@@ -1,16 +1,16 @@
 import {DashboardLayout} from '@/components/layouts/dashboard';
 import {cn} from '@/lib/utils';
 import {ArrowLeft} from 'lucide-react';
-import {useEffect, useMemo, useState} from 'react';
+import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {BusinessDetails} from '../business-details';
 import {BusinessSocials} from '../business_socials';
 import {DirectorDetails} from '../director-details';
-import {SectionValueT} from '../unregistered-business';
+import {RegistrationStageT} from '@/types';
 
 type SectionT = {
   label: string;
-  value: SectionValueT;
+  value: RegistrationStageT;
 };
 
 const sections: SectionT[] = [
@@ -23,32 +23,15 @@ const sections: SectionT[] = [
     value: 'business_socials',
   },
   {
-    label: 'Directors Details',
+    label: `Director's Details`,
     value: 'directors_details',
   },
 ];
 
 export const RegisteredBusinessRegistration = () => {
   const [currentSection, setCurrentSection] =
-    useState<SectionValueT>('business_details');
-
-  const completed: SectionValueT[] = useMemo(() => {
-    return ['business_details', 'business_socials', 'directors_details'];
-  }, []);
-
-  useEffect(() => {
-    const lastCompletedIndex =
-      completed.length > 0
-        ? sections.findIndex(
-            section => section.value === completed[completed.length - 1],
-          )
-        : -1;
-    const nextSectionIndex = lastCompletedIndex + 1;
-
-    if (nextSectionIndex < sections.length) {
-      setCurrentSection(sections[nextSectionIndex].value);
-    }
-  }, [completed]);
+    useState<RegistrationStageT>('business_details');
+  const [completed, setCompleted] = useState<RegistrationStageT[]>([]);
 
   return (
     <DashboardLayout pageTitle={<PageTitle />}>
@@ -56,9 +39,9 @@ export const RegisteredBusinessRegistration = () => {
         <div className="w-full h-full max-w-[602px] mx-auto">
           <nav className="py-4 px-6 flex items-center gap-7 rounded-full bg-white">
             {sections.map((section, index) => {
-              const isDisabled = sections
-                .slice(0, index)
-                .some(prevSection => !completed.includes(prevSection.value));
+              // const isDisabled = sections
+              //   .slice(0, index)
+              //   .some(prevSection => !completed.includes(prevSection.value));
 
               return (
                 <button
@@ -68,7 +51,7 @@ export const RegisteredBusinessRegistration = () => {
                     section.value === currentSection
                       ? 'text-pashBlack-1 font-medium'
                       : 'text-pashBlack-7',
-                    isDisabled ? 'pointer-events-none' : '',
+                    // isDisabled ? 'pointer-events-none' : '',
                   )}
                   onClick={() => setCurrentSection(section.value)}
                 >
@@ -90,11 +73,18 @@ export const RegisteredBusinessRegistration = () => {
 
           <div className="h-[calc(100%-56px-24px)]">
             {currentSection === 'business_details' && (
-              <BusinessDetails setCurrentSection={setCurrentSection} />
+              <BusinessDetails
+                setCurrentSection={setCurrentSection}
+                setCompleted={setCompleted}
+                completed={completed}
+                business_type="registered"
+              />
             )}
             {currentSection === 'business_socials' && (
               <BusinessSocials
                 setCurrentSection={setCurrentSection}
+                setCompleted={setCompleted}
+                completed={completed}
                 business_type="registered"
               />
             )}

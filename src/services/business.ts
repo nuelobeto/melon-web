@@ -1,43 +1,39 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import apiClient from '@/config/axiosInstance';
 import {
+  MelonReceiptT,
   UpdateBusinessDetailsT,
-  UpdateDirectorDetailsT,
   UpdatePersonalDetailsT,
+  UpdateSocialsT,
 } from '@/types';
 
 const getBusiness = async (business_id: string) => {
   const res = await apiClient.get(`/businesses/${business_id}`);
-  localStorage.setItem('business', JSON.stringify(res.data.data));
   return res.data;
 };
 
-const updateBusinessDetails = async (
-  payload: UpdateBusinessDetailsT,
-  business_id: string,
-) => {
-  const res = await apiClient.put(`/businesses/${business_id}`, payload);
+const updateBusinessDetails = async (payload: UpdateBusinessDetailsT) => {
+  const res = await apiClient.put(
+    `/businesses/${payload.business_id}`,
+    payload.details,
+  );
   return res.data;
 };
 
-const getPersonalDetails = async (member_id: string) => {
-  const res = await apiClient.get(`/businesses/personal/${member_id}`);
+const updateSocials = async (payload: UpdateSocialsT) => {
+  const res = await apiClient.put(`/businesses/socials`, payload);
   return res.data;
 };
 
-const updatePersonalDetails = async (
-  payload: UpdatePersonalDetailsT,
-  member_id: string,
-) => {
-  const res = await apiClient.put(`/businesses/personal/${member_id}`, payload);
+const updatePersonalDetails = async (payload: UpdatePersonalDetailsT) => {
+  const res = await apiClient.put(
+    `/businesses/personal/${payload.member_id}`,
+    payload.details,
+  );
   return res.data;
 };
 
-const getDirectorDetails = async (business_id: string) => {
-  const res = await apiClient.get(`businesses/director/${business_id}`);
-  return res.data;
-};
-
-const updateDirectorDetails = async (payload: UpdateDirectorDetailsT) => {
+const updateDirectorDetails = async (payload: any) => {
   const res = await apiClient.put(`/businesses/director`, payload);
   return res.data;
 };
@@ -52,29 +48,36 @@ const resendOtp = async (phone_number: string) => {
   return res.data;
 };
 
-const getTotalPatronage = async (filter: string) => {
-  const res = await apiClient.get(
-    `/businesses/receipt-analysis?filter=${filter}`,
-  );
+const getOverview = async () => {
+  const res = await apiClient.get(`/businesses/overview`);
   return res.data;
 };
 
-const getRecentEngagement = async () => {
+const getActivities = async () => {
   const res = await apiClient.get(`/businesses/recent-engagements`);
+  return res.data;
+};
+
+const sendReceipt = async (payload: MelonReceiptT, api_key: string) => {
+  const headers = {
+    'x-api-key': api_key,
+    withCredentials: true,
+  };
+  const res = await apiClient.post(`/widget`, payload, {headers});
   return res.data;
 };
 
 const businessServices = {
   getBusiness,
   updateBusinessDetails,
+  updateSocials,
   verifyDirectorPhone,
   resendOtp,
-  getTotalPatronage,
-  getRecentEngagement,
-  getPersonalDetails,
+  getOverview,
+  getActivities,
   updatePersonalDetails,
-  getDirectorDetails,
   updateDirectorDetails,
+  sendReceipt,
 };
 
 export default businessServices;

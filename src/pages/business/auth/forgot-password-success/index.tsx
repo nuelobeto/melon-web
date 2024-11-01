@@ -2,34 +2,31 @@
 import {LogoWhite} from '@/components/ui/logo';
 import {ScrollArea} from '@/components/ui/scroll-area';
 import authServices from '@/services/auth';
-import {ApiResponseT} from '@/types';
+import {useMutation} from '@tanstack/react-query';
 import {Loader2} from 'lucide-react';
-import {useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {toast} from 'react-toastify';
 
 export const ForgotPasswordSuccess = () => {
-  const [loading, setLoading] = useState(false);
-
   const params = useParams();
   const email = params.email;
+
+  const {mutate, status} = useMutation({
+    mutationFn: authServices.forgotPassword,
+    onSuccess: data => {
+      toast.success(data.message);
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message);
+    },
+  });
 
   async function resendLink() {
     if (!email) {
       return;
     }
 
-    setLoading(true);
-    try {
-      const res: ApiResponseT = await authServices.forgotPassword(email);
-
-      if (res.status === 'success') {
-        setLoading(false);
-        toast.success(res.message);
-      }
-    } catch (error: any) {
-      setLoading(false);
-    }
+    mutate(email);
   }
 
   return (
@@ -62,9 +59,9 @@ export const ForgotPasswordSuccess = () => {
               <button
                 className="text-pink-1"
                 onClick={resendLink}
-                disabled={loading}
+                disabled={status === 'pending'}
               >
-                {loading ? (
+                {status === 'pending' ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
                 ) : (
                   'Resend'

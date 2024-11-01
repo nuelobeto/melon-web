@@ -4,19 +4,12 @@ import {EnterPhone} from '@/pages/customer/auth/enter-phone';
 import {VerifyEmailMobile} from '@/pages/customer/auth/verify-email';
 import {VerifyPhoneMobile} from '@/pages/customer/auth/verify-phone';
 import {DowloadApp} from '@/pages/customer/auth/dowload-app';
-import {Settings} from '@/pages/business/dashboard/settings/settings';
-import {ProfileSettings} from '@/pages/business/dashboard/settings/profile';
-import {BusinessSettings} from '@/pages/business/dashboard/settings/business';
-import {Guides} from '@/pages/business/dashboard/settings/guides/guides';
-import {WebGuide} from '@/pages/business/dashboard/settings/guides/web-guide';
-import {MobileGuide} from '@/pages/business/dashboard/settings/guides/mobile-guide';
 import ProtectedRoutes from '@/components/layouts/ProtectedRoutes';
 import {NotFound} from '@/pages/404';
-import {SendCustomerReceipt} from '@/pages/business/send-customer-receipt';
-import {CreateBusinessAccount} from '@/pages/business/auth/create-account';
-import {BusinessSignIn} from '@/pages/business/auth/login';
-import {BusinessAccountVerified} from '@/pages/business/auth/account-verified';
-import {VerifyBusinessAccount} from '@/pages/business/auth/verify-email';
+import {CreateAccount} from '@/pages/business/auth/create-account';
+import {Login} from '@/pages/business/auth/login';
+import {AccountVerified} from '@/pages/business/auth/account-verified';
+import {VerifyEmail} from '@/pages/business/auth/verify-email';
 import {ForgotPassword} from '@/pages/business/auth/forgot-password';
 import {ForgotPasswordSuccess} from '@/pages/business/auth/forgot-password-success';
 import {ResetPassword} from '@/pages/business/auth/reset-password';
@@ -36,10 +29,7 @@ import {SendReward} from '@/pages/business/dashboard/send-reward';
 const AppRouter = () => {
   return (
     <Routes>
-      <Route
-        path="/"
-        element={<Navigate to={ROUTES.businessSignIn} replace={true} />}
-      />
+      <Route path="/" element={<Navigate to={ROUTES.login} replace={true} />} />
 
       {/* customer onboarding */}
       <Route path={ROUTES.verifyEmailMobile} element={<VerifyEmailMobile />} />
@@ -53,23 +43,10 @@ const AppRouter = () => {
 
       {/* BUSINESS */}
       {/* Auth  */}
-      <Route
-        path={ROUTES.createBusinessAccount}
-        element={<CreateBusinessAccount />}
-      />
-      <Route
-        path={ROUTES.verifyBusinessAccount}
-        element={<VerifyBusinessAccount />}
-      />
-      <Route path={ROUTES.businessSignIn} element={<BusinessSignIn />} />
-      <Route
-        path={ROUTES.businessAccountVerified}
-        element={<BusinessAccountVerified />}
-      />
-      <Route
-        path={ROUTES.businessAccountVerified}
-        element={<BusinessAccountVerified />}
-      />
+      <Route path={ROUTES.createAccount} element={<CreateAccount />} />
+      <Route path={ROUTES.verifyEmail} element={<VerifyEmail />} />
+      <Route path={ROUTES.login} element={<Login />} />
+      <Route path={ROUTES.accountVerified} element={<AccountVerified />} />
       <Route
         path={ROUTES.forgotBusinessPassword}
         element={<ForgotPassword />}
@@ -120,35 +97,11 @@ const AppRouter = () => {
         {/* transactions */}
         <Route path={ROUTES.transactions} element={<Transactions />} />
 
+        {/* settings */}
+        <Route path={ROUTES.settings} element={<Home />} />
+
         {/* send reward */}
         <Route path={ROUTES.sendReward} element={<SendReward />} />
-
-        {/* settings */}
-        <Route path={ROUTES.settings} element={<Settings />}>
-          <Route
-            path=""
-            element={<Navigate to={ROUTES.profileSettngs} replace={true} />}
-          />
-          <Route path={ROUTES.profileSettngs} element={<ProfileSettings />} />
-          <Route path={ROUTES.businessSettngs} element={<BusinessSettings />} />
-          <Route path={ROUTES.guides} element={<Guides />}>
-            <Route
-              path=""
-              element={
-                <Navigate to={ROUTES.webWidgetIntegration} replace={true} />
-              }
-            />
-            <Route path={ROUTES.webWidgetIntegration} element={<WebGuide />} />
-            <Route
-              path={ROUTES.mobileWidgetIntegration}
-              element={<MobileGuide />}
-            />
-          </Route>
-        </Route>
-        <Route
-          path={ROUTES.sendCustomerReceipt}
-          element={<SendCustomerReceipt />}
-        />
       </Route>
 
       <Route path="*" element={<NotFound />} />
