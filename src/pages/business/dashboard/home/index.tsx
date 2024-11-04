@@ -9,6 +9,12 @@ export const Home = () => {
   const {data: overview} = useFetchOverview();
   const navigate = useNavigate();
 
+  const formattedAmount = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'NGN',
+    minimumFractionDigits: 0,
+  }).format(overview?.data[0]?.total_amount ?? 0);
+
   return (
     <DashboardLayout pageTitle="Home">
       <div className="w-full min-h-full px-7 py-9 bg-[#F5F6F8]">
@@ -62,35 +68,37 @@ export const Home = () => {
           <div className="grid grid-cols-3 gap-[14px] mt-4">
             <div className="py-5 px-3 rounded-[10px] bg-mountainAsh-10">
               <h3 className="text-base font-semibold text-pashBlack-1">
-                Total Customer
+                Total Customers
               </h3>
               <p className="text-sm text-pashBlack-5 mt-1">
                 Total number of customers
               </p>
-              <p className="text-pashBlack-1 mt-3 text-3xl font-semibold">
+              <p className="text-pashBlack-1 mt-3 text-2xl font-semibold">
                 {overview?.data[0]?.total_customer ?? 0}
               </p>
             </div>
             <div className="py-5 px-3 rounded-[10px] bg-mountainAsh-10">
               <h3 className="text-base font-semibold text-pashBlack-1">
-                Total Transaction volume
+                Total Transactions processed
               </h3>
               <p className="text-sm text-pashBlack-5 mt-1">
-                Total number of customers
+                Total number of transactions
               </p>
-              <p className="text-pashBlack-1 mt-3 text-3xl font-semibold">
-                {overview?.data[0]?.total_transaction ?? 0}
+              <p className="text-pashBlack-1 mt-3 text-2xl font-semibold">
+                {formattedAmount}
               </p>
             </div>
             <div className="py-5 px-3 rounded-[10px] bg-mountainAsh-10">
               <h3 className="text-base font-semibold text-pashBlack-1">
-                Total Points earned
+                Total Points processed
               </h3>
               <p className="text-sm text-pashBlack-5 mt-1">
-                Total number of customers
+                Total number of points
               </p>
-              <p className="text-pashBlack-1 mt-3 text-3xl font-semibold">
-                {overview?.data[0]?.sum ?? 0}
+              <p className="text-pashBlack-1 mt-3 text-2xl font-semibold">
+                {(overview?.data[0]?.total_point_earned ?? 0).toLocaleString(
+                  'en-US',
+                )}
               </p>
             </div>
           </div>

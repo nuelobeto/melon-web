@@ -21,9 +21,30 @@ import {
 import {ChevronRight} from 'lucide-react';
 import {Badge} from '@/components/ui/badge';
 import {useFetchActivities} from '@/hooks/useQueries';
+import {useMemo, useState} from 'react';
+import {TransactionDetails} from '../transactions/transaction-details';
 
 export const RecentTransactions = () => {
-  const {data: transactions} = useFetchActivities();
+  const {data: transactions} = useFetchActivities({page: 1});
+  const [openDetails, setOpenDetails] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<TransactionT | null>(null);
+
+  const tableData = useMemo(() => {
+    return (
+      transactions?.data?.results?.map((t: TransactionT) => {
+        return {
+          id: t.id,
+          amount: t.amount,
+          point_type: t.point_type,
+          created_at: t.created_at,
+          receipt_id: t.receipt_id,
+          melon_id: t.melon_id,
+          items: t.items,
+        };
+      }) || []
+    );
+  }, [transactions?.data?.results]);
 
   const columns: ColumnDef<TransactionT>[] = [
     {
@@ -44,9 +65,15 @@ export const RecentTransactions = () => {
     {
       accessorKey: 'amount',
       header: 'Amount',
-      cell: ({row}) => (
-        <p className="text-pashBlack-5">NGN {row.getValue('amount')}</p>
-      ),
+      cell: ({row}) => {
+        const formattedAmount = new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'NGN',
+          minimumFractionDigits: 0,
+        }).format(row.getValue<number>('amount'));
+
+        return <p className="text-pashBlack-5">{formattedAmount}</p>;
+      },
     },
 
     {
@@ -70,7 +97,7 @@ export const RecentTransactions = () => {
   ];
 
   const table = useReactTable({
-    data: transactions?.data?.results ?? [],
+    data: tableData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -109,6 +136,10 @@ export const RecentTransactions = () => {
                 key={row.id}
                 data-state={row.getIsSelected() && 'selected'}
                 className="cursor-pointer"
+                onClick={() => {
+                  setSelectedTransaction(row.original);
+                  setOpenDetails(true);
+                }}
               >
                 {row.getVisibleCells().map(cell => (
                   <TableCell
@@ -140,6 +171,12 @@ export const RecentTransactions = () => {
           )}
         </TableBody>
       </Table>
+
+      <TransactionDetails
+        transaction={selectedTransaction}
+        open={openDetails}
+        setOpen={setOpenDetails}
+      />
     </div>
   );
 };

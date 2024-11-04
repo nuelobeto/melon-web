@@ -16,9 +16,17 @@ export const useFetchOverview = () => {
   });
 };
 
-export const useFetchActivities = () => {
+export const useFetchActivities = ({
+  start_date,
+  end_date,
+  page,
+}: {
+  start_date?: string;
+  end_date?: string;
+  page?: number;
+}) => {
   return useQuery({
-    queryKey: ['activities'],
-    queryFn: () => businessServices.getActivities(),
+    queryKey: ['activities', page, start_date, end_date],
+    queryFn: () => businessServices.getActivities(start_date, end_date, page),
   });
 };

@@ -192,8 +192,8 @@ export type MelonReceiptT = {
 
 export type ReceiptItemT = {
   item: string;
-  amount: number;
-  quantity: number;
+  amount: string;
+  quantity: string;
 };
 
 export type PointTypeT = 'standard' | 'offer';

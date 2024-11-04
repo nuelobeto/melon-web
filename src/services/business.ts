@@ -53,8 +53,16 @@ const getOverview = async () => {
   return res.data;
 };
 
-const getActivities = async () => {
-  const res = await apiClient.get(`/businesses/recent-engagements`);
+const getActivities = async (
+  start_date?: string,
+  end_date?: string,
+  page?: number,
+) => {
+  const res = await apiClient.get(
+    `/businesses/recent-engagements?start_date=${start_date ?? ''}&&end_date=${
+      end_date ?? ''
+    }&&page=${String(page) ?? ''}`,
+  );
   return res.data;
 };
 

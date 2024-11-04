@@ -39,8 +39,8 @@ export const Manual = () => {
   const addItem = () => {
     const newItem: ReceiptItemT = {
       item: '',
-      quantity: 1,
-      amount: 0,
+      quantity: '1',
+      amount: '',
     };
     setItems([...items, newItem]);
   };
@@ -63,12 +63,18 @@ export const Manual = () => {
 
   const calculateTotalAmount = () => {
     return items.reduce((total, item) => {
-      if (item.quantity > 0 && item.amount > 0) {
-        return total + item.quantity * item.amount;
+      if (Number(item.quantity) > 0 && Number(item.amount) > 0) {
+        return total + Number(item.quantity) * Number(item.amount);
       }
       return total;
     }, 0);
   };
+
+  const formattedAmount = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'NGN',
+    minimumFractionDigits: 2,
+  }).format(calculateTotalAmount());
 
   const {mutate, status} = useMutation({
     mutationFn: businessServices.sendReceipt,
@@ -267,7 +273,7 @@ export const Manual = () => {
                       <td></td>
                       <td></td>
                       <td className="text-sm px-4 py-2.5 text-left font-semibold">
-                        {calculateTotalAmount().toFixed(2)}
+                        {formattedAmount}
                       </td>
                       <td></td>
                     </tr>
