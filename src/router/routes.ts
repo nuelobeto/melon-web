@@ -30,7 +30,7 @@ export const ROUTES = {
   home: '/home',
   transactions: '/transactions',
   sendReward: '/send-reward',
-  customerReward: '/send-reward/customer/:api_key/:name',
+  customerReward: '/send-reward/customer/:api_key/:store_name',
   settings: '/settings',
   businessSettngs: '/settings/business',
   profileSettngs: '/settings/profile',

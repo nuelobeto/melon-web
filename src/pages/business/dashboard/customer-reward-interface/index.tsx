@@ -11,15 +11,9 @@ import {Calendar} from '@/components/ui/calendar';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import businessServices from '@/services/business';
 import {DashboardLayout} from '@/components/layouts/dashboard';
-import {useFetchBusiness} from '@/hooks/useQueries';
-import {useAuth} from '@/store/useAuth';
+import {useParams} from 'react-router-dom';
 
 export const CustomerRewardInterface = () => {
-  const {user} = useAuth();
-  const {data: business} = useFetchBusiness({
-    businessId: user?.business_id as string,
-  });
-
   const [melonId, setMelonId] = useState('');
   const [storeName, setStoreName] = useState('');
   const [reference, setReference] = useState('');
@@ -27,7 +21,9 @@ export const CustomerRewardInterface = () => {
   const [items, setItems] = useState<ReceiptItemT[]>([]);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const apiKey = business?.data?.plain_key;
+  const params = useParams();
+  const apiKey = params.api_key;
+  const STORENAME = params.store_name;
 
   console.log(success);
 
@@ -102,6 +98,12 @@ export const CustomerRewardInterface = () => {
     generateReferenceNumber();
   }, []);
 
+  useEffect(() => {
+    if (STORENAME) {
+      setStoreName(STORENAME);
+    }
+  }, [STORENAME]);
+
   return (
     <DashboardLayout pageTitle={'Activate Reward Points'}>
       <div className="w-full h-[calc(100vh-64px)] px-7 py-9 bg-[#F5F6F8]">
@@ -137,6 +139,7 @@ export const CustomerRewardInterface = () => {
                     onChange={e => setStoreName(e.target.value)}
                     required
                     className="h-12"
+                    disabled
                   />
                 </div>
                 <div className="flex flex-col gap-2">

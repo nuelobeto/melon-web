@@ -10,16 +10,19 @@ export const QrCode = () => {
   const {data: business} = useFetchBusiness({
     businessId: user?.business_id as string,
   });
+  const [qrCodeValue, setQrCodeValue] = useState<string | null>(null);
+
   const apiKey = business?.data?.plain_key;
   const storeName = business?.data?.details?.name;
-  const [qrCodeValue, setQrCodeValue] = useState<string | null>(null);
+  // const devUrl = 'http://localhost:5173/';
+  const prodUrl = 'https://melon-app.vercel.app';
 
   useEffect(() => {
     const generateQrCode = () => {
       setQrCodeValue(
-        `https://melon-app.vercel.app${ROUTES.customerReward
+        `${prodUrl}${ROUTES.customerReward
           .replace(':api_key', apiKey)
-          .replace(':name', encodeURIComponent(storeName))}`,
+          .replace(':store_name', encodeURIComponent(storeName))}`,
       );
     };
     generateQrCode();
