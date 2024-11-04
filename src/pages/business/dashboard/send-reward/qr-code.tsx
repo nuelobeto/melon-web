@@ -17,7 +17,7 @@ export const QrCode = () => {
   useEffect(() => {
     const generateQrCode = () => {
       setQrCodeValue(
-        `http://localhost:5173${ROUTES.customerReward
+        `https://melon-app.vercel.app${ROUTES.customerReward
           .replace(':api_key', apiKey)
           .replace(':name', encodeURIComponent(storeName))}`,
       );
