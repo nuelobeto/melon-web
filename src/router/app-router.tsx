@@ -25,6 +25,7 @@ import {MobileDocs} from '@/pages/business/dashboard/documentation/mobile';
 import {Home} from '@/pages/business/dashboard/home';
 import {Transactions} from '@/pages/business/dashboard/transactions';
 import {SendReward} from '@/pages/business/dashboard/send-reward';
+import {CustomerRewardInterface} from '@/pages/business/dashboard/customer-reward-interface';
 
 const AppRouter = () => {
   return (
@@ -103,6 +104,11 @@ const AppRouter = () => {
         {/* send reward */}
         <Route path={ROUTES.sendReward} element={<SendReward />} />
       </Route>
+
+      <Route
+        path={ROUTES.customerReward}
+        element={<CustomerRewardInterface />}
+      />
 
       <Route path="*" element={<NotFound />} />
     </Routes>

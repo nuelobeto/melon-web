@@ -10,8 +10,15 @@ import {cn} from '@/lib/utils';
 import {Calendar} from '@/components/ui/calendar';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import businessServices from '@/services/business';
+import {useFetchBusiness} from '@/hooks/useQueries';
+import {useAuth} from '@/store/useAuth';
 
 export const Manual = () => {
+  const {user} = useAuth();
+  const {data: business} = useFetchBusiness({
+    businessId: user?.business_id as string,
+  });
+
   const [melonId, setMelonId] = useState('');
   const [storeName, setStoreName] = useState('');
   const [reference, setReference] = useState('');
@@ -19,7 +26,7 @@ export const Manual = () => {
   const [items, setItems] = useState<ReceiptItemT[]>([]);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const apiKey = '';
+  const apiKey = business?.data?.plain_key;
 
   const generateReferenceNumber = () => {
     const timestamp = Date.now();

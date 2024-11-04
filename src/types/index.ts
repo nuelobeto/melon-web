@@ -82,6 +82,7 @@ export type ApiResponseT = {
 export type BusinessT = {
   id: string;
   profile_completed: boolean;
+  plain_key: string;
   type: 'registered' | 'unregistered';
   details?: {
     logo: string | null;

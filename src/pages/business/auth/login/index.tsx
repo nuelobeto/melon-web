@@ -21,19 +21,21 @@ import {LoginT} from '@/types';
 import {useEffect, useState} from 'react';
 import authServices from '@/services/auth';
 import {useAuth} from '@/store/useAuth';
-import {emailSchema, passwordSchema} from '@/helpers/zod-schema';
+import {emailSchema} from '@/helpers/zod-schema';
 import {useMutation} from '@tanstack/react-query';
 import {toast} from 'react-toastify';
 import {useFetchBusiness} from '@/hooks/useQueries';
 
 const formSchema = z.object({
   business_email: emailSchema('Please enter your business email.'),
-  password: passwordSchema(),
+  password: z.string().min(1, {
+    message: 'Enter your password.',
+  }),
 });
 
 export const Login = () => {
   const {user, setUser} = useAuth();
-  const {data: business} = useFetchBusiness({
+  const {data: business, refetch: refetchBusiness} = useFetchBusiness({
     businessId: user?.business_id as string,
   });
   const [showPassword, setShowpassword] = useState(false);
@@ -52,6 +54,7 @@ export const Login = () => {
     mutationFn: authServices.login,
     onSuccess: data => {
       setUser(data.data.member);
+      refetchBusiness();
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message);

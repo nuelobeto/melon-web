@@ -1,29 +1,38 @@
 import {ScrollArea} from '@/components/ui/scroll-area';
+import {useFetchBusiness} from '@/hooks/useQueries';
+import {ROUTES} from '@/router/routes';
+import {useAuth} from '@/store/useAuth';
 import {QRCodeSVG} from 'qrcode.react';
 import {useEffect, useState} from 'react';
 
 export const QrCode = () => {
+  const {user} = useAuth();
+  const {data: business} = useFetchBusiness({
+    businessId: user?.business_id as string,
+  });
+  const apiKey = business?.data?.plain_key;
+  const storeName = business?.data?.details?.name;
   const [qrCodeValue, setQrCodeValue] = useState<string | null>(null);
 
-  const generateQrCode = () => {
-    setQrCodeValue('https://your-url-or-unique-id.com');
-  };
-
   useEffect(() => {
+    const generateQrCode = () => {
+      setQrCodeValue(
+        `http://localhost:5173${ROUTES.customerReward
+          .replace(':api_key', apiKey)
+          .replace(':name', encodeURIComponent(storeName))}`,
+      );
+    };
     generateQrCode();
-  }, []);
+  }, [apiKey, storeName]);
 
   return (
     <div className="w-full h-[calc(100%-102px-24px)] bg-white rounded-3xl mt-6">
       <ScrollArea className="w-full h-full">
         <div className="py-10 px-11">
           <div className="space-y-1">
-            <h1 className="text-3xl font-medium text-pashBlack-1">
-              Generate QR Code
-            </h1>
+            <h1 className="text-3xl font-medium text-pashBlack-1">QR Code</h1>
             <p className="text-sm text-pashBlack-7">
-              Generate a customers QR Code where your customers can scan to earn
-              their reward points for this transaction
+              QR Code for your customers can scan to earn their reward points
             </p>
           </div>
 

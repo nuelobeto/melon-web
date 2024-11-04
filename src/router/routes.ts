@@ -15,12 +15,12 @@ export const ROUTES = {
   forgotPasswordSuccess: '/auth/forgot-password/:email',
   resetPassword: '/business/forget-password/:token',
 
-  // business onboarding
-  businessOnboarding: '/onboarding/business',
-  businessPersonalDetails: '/onboarding/business/personal-details',
-  businessDetails: '/onboarding/business/details',
-  businessDirectorDetails: '/onboarding/business/director-details',
-  businessOnboardingSuccess: '/onboarding/business/success',
+  // registration
+  registeredBusinessRegistration: '/onboarding/resgistered-business',
+  verifyDirectorPhone: '/onboarding/business/verify-phone/:phone',
+  unRegisteredBusinessRegistration: '/onboarding/unresgistered-business',
+  verifyOwnerPhone: '/onboarding/business/owner/verify-phone/:phone',
+  registrationSuccess: '/onboarding/success',
 
   // dashboard
   getStarted: '/get-started',
@@ -30,6 +30,7 @@ export const ROUTES = {
   home: '/home',
   transactions: '/transactions',
   sendReward: '/send-reward',
+  customerReward: '/send-reward/customer/:api_key/:name',
   settings: '/settings',
   businessSettngs: '/settings/business',
   profileSettngs: '/settings/profile',
@@ -37,11 +38,4 @@ export const ROUTES = {
   webWidgetIntegration: '/settings/guides/web',
   mobileWidgetIntegration: '/settings/guides/mobile',
   sendCustomerReceipt: '/send-customer-receipt',
-
-  // registration
-  registeredBusinessRegistration: '/onboarding/resgistered-business',
-  verifyDirectorPhone: '/onboarding/business/verify-phone/:phone',
-  unRegisteredBusinessRegistration: '/onboarding/unresgistered-business',
-  verifyOwnerPhone: '/onboarding/business/owner/verify-phone/:phone',
-  registrationSuccess: '/onboarding/success',
 };
