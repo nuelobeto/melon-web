@@ -1,17 +1,20 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {ScrollArea} from '@/components/ui/scroll-area';
-import {MelonReceiptT, ReceiptItemT} from '@/types';
+import {MelonReceiptT, ReceiptItemT, SendRewardT} from '@/types';
 import {format} from 'date-fns';
 import {useEffect, useState} from 'react';
-import {Calendar as CalendarIcon, Plus, Trash2} from 'lucide-react';
+import {Calendar as CalendarIcon, Loader2, Plus, Trash2} from 'lucide-react';
 import {cn} from '@/lib/utils';
 import {Calendar} from '@/components/ui/calendar';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import businessServices from '@/services/business';
 import {DashboardLayout} from '@/components/layouts/dashboard';
 import {useParams} from 'react-router-dom';
+import {useMutation} from '@tanstack/react-query';
+import {toast} from 'react-toastify';
 
 export const CustomerRewardInterface = () => {
   const [melonId, setMelonId] = useState('');
@@ -19,13 +22,9 @@ export const CustomerRewardInterface = () => {
   const [reference, setReference] = useState('');
   const [date, setDate] = useState<Date>(new Date());
   const [items, setItems] = useState<ReceiptItemT[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
   const params = useParams();
-  const apiKey = params.api_key;
+  const api_key = params.api_key;
   const STORENAME = params.store_name;
-
-  console.log(success);
 
   const generateReferenceNumber = () => {
     const timestamp = Date.now();
@@ -67,12 +66,27 @@ export const CustomerRewardInterface = () => {
     }, 0);
   };
 
+  const {mutate, status} = useMutation({
+    mutationFn: businessServices.sendReceipt,
+    onSuccess: () => {
+      toast.success('Point rewards sent');
+      setMelonId('');
+      setReference('');
+      setDate(new Date());
+      setItems([]);
+      generateReferenceNumber();
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message);
+    },
+  });
+
   const handleSendReceipt = async () => {
-    if (!apiKey) {
+    if (!api_key) {
       return console.log('No api key');
     }
 
-    const payload: MelonReceiptT = {
+    const receipt: MelonReceiptT = {
       melon_id: melonId,
       store_name: storeName,
       reference: reference,
@@ -80,18 +94,13 @@ export const CustomerRewardInterface = () => {
       date: format(date!, 'yyyy-MM-dd'),
       total_amount: Number(calculateTotalAmount().toFixed(2)),
     };
-    setLoading(true);
-    try {
-      const res = await businessServices.sendReceipt(payload, apiKey);
-      if (res.status === 'success') {
-        setLoading(false);
-        setSuccess(true);
-        console.log(payload);
-      }
-    } catch (error) {
-      console.log(error);
-      setLoading(false);
-    }
+
+    const payload: SendRewardT = {
+      receipt,
+      api_key,
+    };
+
+    mutate(payload);
   };
 
   useEffect(() => {
@@ -293,9 +302,13 @@ export const CustomerRewardInterface = () => {
               size={'lg'}
               className="w-full"
               onClick={handleSendReceipt}
-              disabled={loading}
+              disabled={status === 'pending'}
             >
-              Submit
+              {status === 'pending' ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                'Submit'
+              )}
             </Button>
           </div>
         </div>

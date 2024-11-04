@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import apiClient from '@/config/axiosInstance';
 import {
-  MelonReceiptT,
+  SendRewardT,
   UpdateBusinessDetailsT,
   UpdatePersonalDetailsT,
   UpdateSocialsT,
@@ -58,12 +58,12 @@ const getActivities = async () => {
   return res.data;
 };
 
-const sendReceipt = async (payload: MelonReceiptT, api_key: string) => {
+const sendReceipt = async (payload: SendRewardT) => {
   const headers = {
-    'x-api-key': api_key,
+    'x-api-key': payload.api_key,
     withCredentials: true,
   };
-  const res = await apiClient.post(`/widget`, payload, {headers});
+  const res = await apiClient.post(`/widget`, payload.receipt, {headers});
   return res.data;
 };
 

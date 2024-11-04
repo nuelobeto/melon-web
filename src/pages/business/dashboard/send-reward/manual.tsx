@@ -1,17 +1,20 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {ScrollArea} from '@/components/ui/scroll-area';
-import {MelonReceiptT, ReceiptItemT} from '@/types';
+import {MelonReceiptT, ReceiptItemT, SendRewardT} from '@/types';
 import {format} from 'date-fns';
 import {useEffect, useState} from 'react';
-import {Calendar as CalendarIcon, Plus, Trash2} from 'lucide-react';
+import {Calendar as CalendarIcon, Loader2, Plus, Trash2} from 'lucide-react';
 import {cn} from '@/lib/utils';
 import {Calendar} from '@/components/ui/calendar';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import businessServices from '@/services/business';
 import {useFetchBusiness} from '@/hooks/useQueries';
 import {useAuth} from '@/store/useAuth';
+import {toast} from 'react-toastify';
+import {useMutation} from '@tanstack/react-query';
 
 export const Manual = () => {
   const {user} = useAuth();
@@ -24,9 +27,8 @@ export const Manual = () => {
   const [reference, setReference] = useState('');
   const [date, setDate] = useState<Date>(new Date());
   const [items, setItems] = useState<ReceiptItemT[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const apiKey = business?.data?.plain_key;
+  const api_key = business?.data?.plain_key as string;
+  const STORENAME = business?.data?.details?.name;
 
   const generateReferenceNumber = () => {
     const timestamp = Date.now();
@@ -68,12 +70,27 @@ export const Manual = () => {
     }, 0);
   };
 
+  const {mutate, status} = useMutation({
+    mutationFn: businessServices.sendReceipt,
+    onSuccess: () => {
+      toast.success('Point rewards sent');
+      setMelonId('');
+      setReference('');
+      setDate(new Date());
+      setItems([]);
+      generateReferenceNumber();
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message);
+    },
+  });
+
   const handleSendReceipt = async () => {
-    if (!apiKey) {
+    if (!api_key) {
       return console.log('No api key');
     }
 
-    const payload: MelonReceiptT = {
+    const receipt: MelonReceiptT = {
       melon_id: melonId,
       store_name: storeName,
       reference: reference,
@@ -81,25 +98,24 @@ export const Manual = () => {
       date: format(date!, 'yyyy-MM-dd'),
       total_amount: Number(calculateTotalAmount().toFixed(2)),
     };
-    setLoading(true);
-    try {
-      const res = await businessServices.sendReceipt(payload, apiKey);
-      if (res.status === 'success') {
-        setLoading(false);
-        setSuccess(true);
-        console.log(payload);
-      }
-    } catch (error) {
-      console.log(error);
-      setLoading(false);
-    }
-  };
 
-  console.log(success);
+    const payload: SendRewardT = {
+      receipt,
+      api_key,
+    };
+
+    mutate(payload);
+  };
 
   useEffect(() => {
     generateReferenceNumber();
   }, []);
+
+  useEffect(() => {
+    if (STORENAME) {
+      setStoreName(STORENAME);
+    }
+  }, [STORENAME]);
 
   return (
     <div className="w-full h-[calc(100%-102px-24px)] bg-white rounded-3xl mt-6">
@@ -134,25 +150,18 @@ export const Manual = () => {
                 onChange={e => setStoreName(e.target.value)}
                 required
                 className="h-12"
+                disabled
               />
             </div>
             <div className="flex flex-col gap-2">
               <Label>Transaction Reference</Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  value={reference}
-                  onChange={e => setReference(e.target.value)}
-                  required
-                  className="h-12"
-                />
-                <Button
-                  variant={'secondary'}
-                  className="border h-12"
-                  onClick={generateReferenceNumber}
-                >
-                  Generate
-                </Button>
-              </div>
+              <Input
+                value={reference}
+                onChange={e => setReference(e.target.value)}
+                required
+                className="h-12"
+                disabled
+              />
             </div>
             <div className="flex flex-col gap-2">
               <Label>Date</Label>
@@ -283,9 +292,13 @@ export const Manual = () => {
           size={'lg'}
           className="w-full"
           onClick={handleSendReceipt}
-          disabled={loading}
+          disabled={status === 'pending'}
         >
-          Submit
+          {status === 'pending' ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            'Submit'
+          )}
         </Button>
       </div>
     </div>

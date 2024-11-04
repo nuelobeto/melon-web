@@ -203,3 +203,8 @@ export type RegistrationStageT =
   | 'business_details'
   | 'business_socials'
   | 'directors_details';
+
+export type SendRewardT = {
+  receipt: MelonReceiptT;
+  api_key: string;
+};
