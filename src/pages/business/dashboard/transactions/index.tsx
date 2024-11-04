@@ -90,7 +90,7 @@ export const Transactions = () => {
           minimumFractionDigits: 0,
         }).format(row.getValue<number>('amount'));
 
-        return <p className="text-pashBlack-5">₦ {formattedAmount}</p>;
+        return <p className="text-pashBlack-5">{formattedAmount}</p>;
       },
     },
     {
