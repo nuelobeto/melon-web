@@ -14,6 +14,7 @@ import businessServices from '@/services/business';
 import {useParams} from 'react-router-dom';
 import {useMutation} from '@tanstack/react-query';
 import {toast} from 'react-toastify';
+import {LogoBlack} from '@/components/ui/logo';
 
 export const CustomerRewardInterface = () => {
   const [melonId, setMelonId] = useState('');
@@ -119,14 +120,16 @@ export const CustomerRewardInterface = () => {
   }, [STORENAME]);
 
   return (
-    <div className="w-full min-[900px]w-[calc(100vw-256px)] h-full">
-      <header className="flex items-center justify-between px-7 h-16 border-b border-mountainAsh-6"></header>
-      <main className="w-full h-[calc(100%-64px)]">
-        <ScrollArea className="w-full h-full">
-          <div className="w-full h-[calc(100vh-64px)] px-7 py-9 bg-[#F5F6F8]">
-            <div className="w-full max-w-[602px] mx-auto h-[calc(100%-102px-24px)] bg-white rounded-3xl mt-6">
+    <div className="w-screen h-screen">
+      <header className="flex items-center justify-center px-7 h-[64px] border-b border-mountainAsh-6">
+        <LogoBlack />
+      </header>
+      <main className="w-full h-[calc(100%-64px-72px)]">
+        {/* <ScrollArea className="w-full h-full">
+          <div className="w-full h-[calc(100vh-64px)] px-4 py-5 bg-[#F5F6F8]">
+            <div className="w-full max-w-[602px] mx-auto h-[calc(100%-102px-24px)] bg-white rounded-3xl">
               <ScrollArea className="w-full h-[calc(100%-85px)]">
-                <div className="py-10 px-11">
+                <div className="p-5">
                   <div className="space-y-1">
                     <h1 className="text-3xl font-medium text-pashBlack-1">
                       Enter Your Purchase Details
@@ -323,8 +326,191 @@ export const CustomerRewardInterface = () => {
               </div>
             </div>
           </div>
+        </ScrollArea> */}
+        <ScrollArea className="w-full h-full">
+          <div className="p-5">
+            <div className="space-y-1">
+              <h1 className="text-3xl font-medium text-pashBlack-1 mt-5">
+                Enter Your Purchase Details
+              </h1>
+              <p className="text-sm text-pashBlack-7">
+                Enter the details of your purchase to earn reward points after
+                the vendor confirms your transaction.
+              </p>
+            </div>
+
+            <div className="mt-6 space-y-6">
+              <div className="flex flex-col gap-2">
+                <Label>Customer's Melon ID</Label>
+                <Input
+                  placeholder="Enter Customers Melon ID or Phone Number"
+                  value={melonId}
+                  onChange={e => setMelonId(e.target.value)}
+                  required
+                  className="placeholder:text-pashBlack-8 h-12"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label>Business Name</Label>
+                <Input
+                  value={storeName}
+                  placeholder="Enter the name of your Business"
+                  onChange={e => setStoreName(e.target.value)}
+                  required
+                  className="h-12"
+                  disabled
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label>Transaction Reference</Label>
+                <Input
+                  value={reference}
+                  onChange={e => setReference(e.target.value)}
+                  required
+                  className="h-12"
+                  disabled
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label>Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={'outline'}
+                      className={cn(
+                        'w-full justify-start text-left font-normal h-12',
+                        !date && 'text-muted-foreground',
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {date && format(date, 'yyyy-MM-dd')}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent align="start" className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      onSelect={day => {
+                        if (day) setDate(day);
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div>
+                <h2 className="font-semibold text-lg text-pashBlack-1 my-2">
+                  Items Purchased
+                </h2>
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-mountainAsh-6">
+                      <th className="text-xs px-4 py-2.5 text-left">S/N</th>
+                      <th className="text-xs px-4 py-2.5 text-left">ITEM</th>
+                      <th className="text-xs px-4 py-2.5 text-left">
+                        QUANTITY
+                      </th>
+                      <th className="text-xs px-4 py-2.5 text-left">AMOUNT</th>
+                      <th className="w-10"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {items.map((item, index) => (
+                      <tr key={index} className="bg-mountainAsh-10 border-b">
+                        <td className="text-sm px-4 py-2.5 text-left">
+                          {index + 1}
+                        </td>
+                        <td className="px-4 py-2.5 text-left">
+                          <input
+                            type="text"
+                            placeholder="Item"
+                            value={item.item}
+                            onChange={e =>
+                              handleItemChange(index, 'item', e.target.value)
+                            }
+                            className="w-full text-sm text-pashBlack-1 outline-none bg-transparent"
+                          />
+                        </td>
+                        <td className="px-4 py-2.5 text-left">
+                          <input
+                            type="number"
+                            value={item.quantity}
+                            onChange={e =>
+                              handleItemChange(
+                                index,
+                                'quantity',
+                                parseInt(e.target.value),
+                              )
+                            }
+                            className="w-full text-sm text-pashBlack-1 outline-none bg-transparent"
+                          />
+                        </td>
+                        <td className="px-4 py-2.5 text-left">
+                          <input
+                            type="number"
+                            value={item.amount}
+                            onChange={e =>
+                              handleItemChange(
+                                index,
+                                'amount',
+                                parseFloat(e.target.value),
+                              )
+                            }
+                            className="w-full text-sm text-pashBlack-1 outline-none bg-transparent"
+                          />
+                        </td>
+                        <td className="w-10">
+                          <button
+                            className="p-1 rounded-md flex items-center justify-center border hover:bg-mountainAsh-8"
+                            onClick={() => deleteItem(index)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                    {items.length > 0 && (
+                      <tr>
+                        <td className="text-sm px-4 py-2.5 text-left font-semibold">
+                          Total
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td className="text-sm px-4 py-2.5 text-left font-semibold">
+                          {formattedAmount}
+                        </td>
+                        <td></td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+                <Button
+                  variant={'secondary'}
+                  className="border mt-4"
+                  onClick={addItem}
+                >
+                  <Plus className="w-5 h-5 mr-2" /> Add item
+                </Button>
+              </div>
+            </div>
+          </div>
         </ScrollArea>
       </main>
+      <footer className="flex items-center justify-center h-[72px] border-t border-mountainAsh-6 px-5">
+        <Button
+          type="submit"
+          size={'lg'}
+          className="w-full"
+          onClick={handleSendReceipt}
+          disabled={status === 'pending'}
+        >
+          {status === 'pending' ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            'Submit'
+          )}
+        </Button>
+      </footer>
     </div>
   );
 };

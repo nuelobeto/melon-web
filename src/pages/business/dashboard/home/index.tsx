@@ -24,10 +24,11 @@ export const Home = () => {
             <h2 className="text-3xl font-semibold text-pashBlack-1 mt-2">
               Selling on Social Media?
             </h2>
-            <p className="text-pashBlack-2 leading-5 mt-2">
-              No worries, you can click the button below to reward your
-              customers or create a store front and have an ordering website
-              where people can order and buy stuff
+            <p className="text-pashBlack-2 leading-5 mt-2 text-sm">
+              No worries! Click below to reward your customers manually, or take
+              it up a notch—create your own storefront with an ordering website.
+              Let your customers shop, earn points automatically, and keep
+              coming back for more!
             </p>
             <div className="w-full max-w-[422px] flex items-center gap-4 mt-4">
               <Button
@@ -48,12 +49,12 @@ export const Home = () => {
             </span>
             <img src="/images/launch-offers.svg" alt="" className="block" />
             <h2 className="text-3xl font-semibold text-pashBlack-1 mt-2">
-              Launch Offers and campaigns
+              Turbocharge Your Sales with Melon Offers!
             </h2>
-            <p className="text-pashBlack-2 leading-5 mt-2">
-              Lorem ipsum dolor sit amet consectetur. Varius at integer
-              consequat amet tortor. Eu id scelerisque tincidunt fermentum quam
-              felis fusce odio pulvinar. Sed non quis scelerisque.
+            <p className="text-pashBlack-2 leading-5 mt-2 text-sm">
+              Get ready to launch irresistible offers that drive customer
+              loyalty, boost engagement, and skyrocket your revenue. Define your
+              rewards, reach the right audience, and watch your business thrive.
             </p>
             <div className="mt-4">
               <Button className="w-[203px] rounded-lg bg-[#0A1C2C] text-white hover:bg-[#0A1C2C] border-transparent">
