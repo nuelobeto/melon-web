@@ -28,6 +28,12 @@ type Props = {
 };
 
 export const TransactionDetails = ({transaction, open, setOpen}: Props) => {
+  const formattedAmount = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'NGN',
+    minimumFractionDigits: 0,
+  }).format(Number(transaction?.amount));
+
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger className="hidden"></SheetTrigger>
@@ -64,7 +70,7 @@ export const TransactionDetails = ({transaction, open, setOpen}: Props) => {
                   <span className="text-pashBlack-1 font-semibold">
                     Amount:
                   </span>{' '}
-                  ₦ {transaction?.amount}
+                  {formattedAmount}
                 </p>
                 <p>
                   <span className="text-pashBlack-1 font-semibold">
@@ -93,13 +99,21 @@ export const TransactionDetails = ({transaction, open, setOpen}: Props) => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {transaction?.items.map((item, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{item.item}</TableCell>
-                        <TableCell>{item.quantity}</TableCell>
-                        <TableCell>{item.amount}</TableCell>
-                      </TableRow>
-                    ))}
+                    {transaction?.items.map((item, index) => {
+                      const formattedAmount = new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'NGN',
+                        minimumFractionDigits: 0,
+                      }).format(Number(item.amount));
+
+                      return (
+                        <TableRow key={index}>
+                          <TableCell>{item.item}</TableCell>
+                          <TableCell>{item.quantity}</TableCell>
+                          <TableCell>{formattedAmount}</TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </div>
