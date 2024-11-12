@@ -56,6 +56,11 @@ export type ResetPasswordT = {
   password: string;
 };
 
+export type CreatePasswordT = {
+  token: string;
+  password: string;
+};
+
 export type UserT = {
   member_id: string;
   business_id: string;

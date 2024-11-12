@@ -29,6 +29,7 @@ import {CustomerRewardInterface} from '@/pages/business/dashboard/customer-rewar
 import {Settings} from '@/pages/business/dashboard/settings';
 import {PersonalSettings} from '@/pages/business/dashboard/settings/personal';
 import {BusinessSettings} from '@/pages/business/dashboard/settings/business';
+import {CreatePassword} from '@/pages/business/auth/create-password';
 
 const AppRouter = () => {
   return (
@@ -60,6 +61,7 @@ const AppRouter = () => {
         element={<ForgotPasswordSuccess />}
       />
       <Route path={ROUTES.resetPassword} element={<ResetPassword />} />
+      <Route path={ROUTES.createPassword} element={<CreatePassword />} />
 
       <Route element={<ProtectedRoutes />}>
         {/* get started */}

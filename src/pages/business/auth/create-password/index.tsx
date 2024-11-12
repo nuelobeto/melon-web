@@ -14,7 +14,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
-import {Link, useNavigate, useParams} from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 import {ROUTES} from '@/router/routes';
 import {Loader2} from 'lucide-react';
 import {ResetPasswordT} from '@/types';
@@ -33,7 +33,7 @@ const formSchema = z
     message: 'Passwords must match',
   });
 
-export const ResetPassword = () => {
+export const CreatePassword = () => {
   const navigate = useNavigate();
   const params = useParams();
   const token = params.token;
@@ -47,7 +47,7 @@ export const ResetPassword = () => {
   });
 
   const {mutate, status} = useMutation({
-    mutationFn: authServices.resetPassword,
+    mutationFn: authServices.createPassword,
     onSuccess: data => {
       toast.success(data.message);
       navigate(ROUTES.login);
@@ -83,7 +83,7 @@ export const ResetPassword = () => {
             >
               <div className="flex flex-col gap-2">
                 <h1 className="font-semibold text-3xl lg:text-4xl text-pashBlack-1 text-center">
-                  Reset Password
+                  Create Password
                 </h1>
                 <p className="text-sm text-pashBlack-4 text-center">
                   Create a new password for your account
@@ -96,7 +96,7 @@ export const ResetPassword = () => {
                   name="password1"
                   render={({field}) => (
                     <FormItem>
-                      <FormLabel>Enter New Password</FormLabel>
+                      <FormLabel>Create Password</FormLabel>
                       <FormControl>
                         <Input
                           type="password"
@@ -138,15 +138,9 @@ export const ResetPassword = () => {
                   {status === 'pending' ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
-                    'Reset password'
+                    'Create password'
                   )}
                 </Button>
-                <p className="font-medium text-sm text-pashBlack-4 text-center">
-                  Remember your password?{' '}
-                  <Link to={ROUTES.login} className="text-pashBlack-1">
-                    Sign in
-                  </Link>
-                </p>
               </div>
             </form>
           </Form>
