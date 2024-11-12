@@ -14,6 +14,7 @@ export const ROUTES = {
   forgotBusinessPassword: '/auth/forgot-password',
   forgotPasswordSuccess: '/auth/forgot-password/:email',
   resetPassword: '/business/forget-password/:token',
+  createPassword: '/business/create-password/:token',
 
   // registration
   registeredBusinessRegistration: '/onboarding/resgistered-business',
@@ -32,10 +33,6 @@ export const ROUTES = {
   sendReward: '/send-reward',
   customerReward: '/send-reward/customer/:api_key/:store_name',
   settings: '/settings',
-  businessSettngs: '/settings/business',
-  profileSettngs: '/settings/profile',
-  guides: '/settings/guides',
-  webWidgetIntegration: '/settings/guides/web',
-  mobileWidgetIntegration: '/settings/guides/mobile',
-  sendCustomerReceipt: '/send-customer-receipt',
+  personalSettings: '/settings/personal',
+  businessSettings: '/settings/business',
 };

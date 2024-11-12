@@ -26,6 +26,9 @@ import {Home} from '@/pages/business/dashboard/home';
 import {Transactions} from '@/pages/business/dashboard/transactions';
 import {SendReward} from '@/pages/business/dashboard/send-reward';
 import {CustomerRewardInterface} from '@/pages/business/dashboard/customer-reward-interface';
+import {Settings} from '@/pages/business/dashboard/settings';
+import {PersonalSettings} from '@/pages/business/dashboard/settings/personal';
+import {BusinessSettings} from '@/pages/business/dashboard/settings/business';
 
 const AppRouter = () => {
   return (
@@ -99,7 +102,20 @@ const AppRouter = () => {
         <Route path={ROUTES.transactions} element={<Transactions />} />
 
         {/* settings */}
-        <Route path={ROUTES.settings} element={<Home />} />
+        <Route path={ROUTES.settings} element={<Settings />}>
+          <Route
+            path=""
+            element={<Navigate to={ROUTES.personalSettings} replace={true} />}
+          />
+          <Route
+            path={ROUTES.personalSettings}
+            element={<PersonalSettings />}
+          />
+          <Route
+            path={ROUTES.businessSettings}
+            element={<BusinessSettings />}
+          />
+        </Route>
 
         {/* send reward */}
         <Route path={ROUTES.sendReward} element={<SendReward />} />

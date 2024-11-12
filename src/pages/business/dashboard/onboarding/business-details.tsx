@@ -260,7 +260,7 @@ export const BusinessDetails = ({
             <div className="mt-6 space-y-6">
               <div className="w-full p-5 border border-dashed border-mountainAsh-1 bg-mountainAsh-10 rounded-md flex flex-col items-center">
                 {logo ? (
-                  <div className="w-[100px] h-[100px] rounded-full p-4 border border-mountainAsh-1 bg-mountainAsh-8">
+                  <div className="w-[100px] h-[100px] rounded-full p-2.5 border border-mountainAsh-1 bg-mountainAsh-8">
                     <img src={logo} className="w-full h-full object-cover" />
                   </div>
                 ) : (
@@ -327,6 +327,7 @@ export const BusinessDetails = ({
                   </div>
                 )}
               </div>
+
               {business_type === 'registered' && (
                 <FormField
                   control={form.control}

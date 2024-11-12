@@ -109,7 +109,10 @@ export type BusinessT = {
     last_name: string | null;
     email: string | null;
     phone_number: string | null;
-    address: string | null;
+    country: string | null;
+    state: string | null;
+    city: string | null;
+    street: string | null;
   };
   personal_details?: {
     first_name: string | null;
