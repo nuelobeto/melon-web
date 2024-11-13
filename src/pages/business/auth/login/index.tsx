@@ -54,7 +54,6 @@ export const Login = () => {
     mutationFn: authServices.login,
     onSuccess: data => {
       setUser(data.data.member);
-      refetchBusiness();
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message);
@@ -71,14 +70,20 @@ export const Login = () => {
   }
 
   useEffect(() => {
-    if (status !== 'success' || !business) return;
+    if (user) {
+      refetchBusiness();
+    }
+  }, [refetchBusiness, user]);
+
+  useEffect(() => {
+    if (!business) return;
 
     if (!business.data.profile_completed) {
       navigate(ROUTES.getStarted);
     } else {
       navigate(ROUTES.home);
     }
-  }, [business, navigate, status]);
+  }, [business, navigate]);
 
   return (
     <main className="w-screen h-screen bg-[#081623] bg-[url('/images/auth-bg.svg')] bg-no-repeat bg-cover">
