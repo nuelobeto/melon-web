@@ -18,13 +18,12 @@ import {Link, useNavigate} from 'react-router-dom';
 import {ROUTES} from '@/router/routes';
 import {Eye, EyeOff, Loader2} from 'lucide-react';
 import {LoginT} from '@/types';
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import authServices from '@/services/auth';
 import {useAuth} from '@/store/useAuth';
 import {emailSchema} from '@/helpers/zod-schema';
 import {useMutation} from '@tanstack/react-query';
 import {toast} from 'react-toastify';
-import {useFetchBusiness} from '@/hooks/useQueries';
 
 const formSchema = z.object({
   business_email: emailSchema('Please enter your business email.'),
@@ -34,10 +33,8 @@ const formSchema = z.object({
 });
 
 export const Login = () => {
-  const {user, setUser} = useAuth();
-  const {data: business, refetch: refetchBusiness} = useFetchBusiness({
-    businessId: user?.business_id as string,
-  });
+  const {setUser} = useAuth();
+
   const [showPassword, setShowpassword] = useState(false);
 
   const navigate = useNavigate();
@@ -54,6 +51,7 @@ export const Login = () => {
     mutationFn: authServices.login,
     onSuccess: data => {
       setUser(data.data.member);
+      navigate(ROUTES.getStarted);
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message);
@@ -68,22 +66,6 @@ export const Login = () => {
 
     mutate(payload);
   }
-
-  useEffect(() => {
-    if (user) {
-      refetchBusiness();
-    }
-  }, [refetchBusiness, user]);
-
-  useEffect(() => {
-    if (!business) return;
-
-    if (!business.data.profile_completed) {
-      navigate(ROUTES.getStarted);
-    } else {
-      navigate(ROUTES.home);
-    }
-  }, [business, navigate]);
 
   return (
     <main className="w-screen h-screen bg-[#081623] bg-[url('/images/auth-bg.svg')] bg-no-repeat bg-cover">

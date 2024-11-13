@@ -2,9 +2,29 @@ import {DashboardLayout} from '@/components/layouts/dashboard';
 import {SelectBusinessType} from './select-business-type';
 import {useNavigate} from 'react-router-dom';
 import {ROUTES} from '@/router/routes';
+import {useAuth} from '@/store/useAuth';
+import {useFetchBusiness} from '@/hooks/useQueries';
+import {useEffect} from 'react';
 
 export const GetStarted = () => {
+  const {user} = useAuth();
+  const {data: business} = useFetchBusiness({
+    businessId: user?.business_id as string,
+  });
+
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!business) {
+      return;
+    }
+
+    if (!business.data.profile_completed) {
+      navigate(ROUTES.getStarted);
+    } else {
+      navigate(ROUTES.home);
+    }
+  }, [business, navigate]);
 
   return (
     <DashboardLayout pageTitle="Get Started">
