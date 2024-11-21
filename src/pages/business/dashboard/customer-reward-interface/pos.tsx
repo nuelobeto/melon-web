@@ -87,8 +87,6 @@ export const PosCustomerRewardInterface = () => {
     generateReferenceNumber();
   }, []);
 
-  console.log(posReceipt);
-
   return (
     <div className="w-screen h-screen bg-[#081623]">
       <div className="w-full h-full max-w-[600px] mx-auto bg-white">
