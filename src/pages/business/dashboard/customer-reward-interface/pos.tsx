@@ -91,7 +91,7 @@ export const PosCustomerRewardInterface = () => {
 
   return (
     <div className="w-screen h-screen bg-[#081623]">
-      <div className="w-full h-full max-w-[400px] mx-auto bg-white">
+      <div className="w-full h-full max-w-[600px] mx-auto bg-white">
         <header className="flex items-center justify-center px-7 h-[64px] border-b border-mountainAsh-6">
           <LogoBlack />
         </header>
