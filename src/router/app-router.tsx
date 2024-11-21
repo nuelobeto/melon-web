@@ -30,6 +30,7 @@ import {Settings} from '@/pages/business/dashboard/settings';
 import {PersonalSettings} from '@/pages/business/dashboard/settings/personal';
 import {BusinessSettings} from '@/pages/business/dashboard/settings/business';
 import {CreatePassword} from '@/pages/business/auth/create-password';
+import {PosCustomerRewardInterface} from '@/pages/business/dashboard/customer-reward-interface/pos';
 
 const AppRouter = () => {
   return (
@@ -126,6 +127,11 @@ const AppRouter = () => {
       <Route
         path={ROUTES.customerReward}
         element={<CustomerRewardInterface />}
+      />
+
+      <Route
+        path={ROUTES.posCustomerReward}
+        element={<PosCustomerRewardInterface />}
       />
 
       <Route path="*" element={<NotFound />} />

@@ -6,7 +6,7 @@ export const NotFound = () => {
       <header className="w-screen py-12 fixed left-0 top-0 flex items-center justify-center px-5 z-50 bg-white">
         <LogoBlack />
       </header>
-      <main className="w-screen h-screen pt-36 flex justify-center">
+      <main className="w-screen h-screen pt-36 flex flex-col items-center justify-center">
         <img
           src="/images/404.jpg"
           alt=""
